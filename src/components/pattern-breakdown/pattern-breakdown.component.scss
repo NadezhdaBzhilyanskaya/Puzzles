@@ -1,6 +1,6 @@
-img {
-  display: none;
-}
+// img {
+//   display: none;
+// }
 
 canvas {
   //height: fit-content;
@@ -108,6 +108,8 @@ canvas {
 }
 
 .options {
+  margin-bottom: 1rem;
+
   .check {
     font-size: 10px;
     width: fit-content;

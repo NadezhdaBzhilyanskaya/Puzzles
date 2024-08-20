@@ -1,5 +1,11 @@
 <!-- <canvas id="canvas" height="1540" width="1150"></canvas> -->
 <!-- <img src="blockview.png" /> -->
+<div class="options">
+  <input type="file" (change)="update($event)" />
+  <input type="number" [value]="Height" (change)="Height = $event.target['value']" />
+  <input type="number" [value]="bumpStart" (change)="bumpStart = $event.target['value']" />
+  <button (click)="updateImage()">Update</button>
+</div>
 <canvas id="canvas"></canvas>
 @if(loaded){
 

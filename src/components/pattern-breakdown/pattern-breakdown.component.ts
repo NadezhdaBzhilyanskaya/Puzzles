@@ -12,6 +12,7 @@ interface Color { r: number, g: number, b: number, a: number, str: string; dmc: 
 })
 export class PatternBreakdownComponent {
   private flossDic: Record<string, Floss> = {};
+  public imageName: any = 'test.png';
   private img: HTMLImageElement;
   private context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
@@ -21,6 +22,7 @@ export class PatternBreakdownComponent {
   public highlighted: string = '';
   public loaded = false;
   public hide: boolean = false;
+  public bumpStart: number = 0;
 
   public Height = 300; // ON IMAGE Change
 
@@ -34,12 +36,36 @@ export class PatternBreakdownComponent {
       f.hex = hex;
       this.flossDic[hex] = { ...f, hex };
     })
+
+    this.updateImage();
+
+  }
+
+  public update(e) {
+    console.log(e.value)
+    for (var i = 0; i < e.srcElement.files.length; i++) {
+
+      var file = e.srcElement.files[i];
+
+      var img = document.createElement("img");
+      var reader = new FileReader();
+      reader.onloadend = () => {
+        this.imageName = reader.result;
+      }
+      reader.readAsDataURL(file);
+      //$("input").after(img);
+    }
+  }
+
+  public updateImage() {
+    this.colors = [];
     try {
+      this.img = undefined;
       this.img = new Image();
       this.canvas = document.getElementsByTagName('canvas')[0];
       this.context = this.canvas.getContext('2d');
       //this.img.src = "blockview.png"; // ON IMAGE Change
-      this.img.src = "test.png";
+      this.img.src = this.imageName;
 
       //this.loadImage()
       this.img.onload = (e) => this.loadImage(e);
@@ -47,12 +73,12 @@ export class PatternBreakdownComponent {
     } catch (e) {
       // Issue anticipated and ignored
     }
-
   }
 
   loadImage(e) {
     if (this.colors.length) return;
     // console.log(e.target.width, e.target.height)
+    this.context.reset();
     this.canvas.height = this.img.height;
     this.canvas.width = this.img.width;
     this.context.drawImage(this.img, 0, 0, this.img.width, this.img.height);
@@ -60,8 +86,8 @@ export class PatternBreakdownComponent {
     this.imageData = this.context.getImageData(0, 0, this.img.width, this.img.height).data;
     console.log(this.img.height, this.img.width)
     const factor = Math.floor(this.img.height / this.Height);
-    console.log(this.img.height, this.img.width, factor)
-    const begin = 0; // ON IMAGE Change
+    console.log(this.img.height, this.img.width, factor, this.bumpStart)
+    const begin = Number(this.bumpStart); // ON IMAGE Change
     for (let y = begin; y < this.img.height; y += factor) {
       const row: Color[] = [];
       for (let x = begin; x < this.img.width; x += factor) {
@@ -85,7 +111,7 @@ export class PatternBreakdownComponent {
     this.removeBorder();
 
     // ON SECTION Change
-    this.colors = this.colors.slice(76, 151).map(r => r.slice(55))//, 171))
+    if (this.imageName == 'test.png') this.colors = this.colors.slice(76, 151).map(r => r.slice(55))//, 171))
     this.uniqueColors = this.getUnique([].concat(...this.colors));
 
     this.uniqueColors.forEach(c => {
@@ -125,7 +151,7 @@ export class PatternBreakdownComponent {
 
     this.colors = this.colors.filter(row => this.getUnique(row).length > 1);
     //specific to just this, last row looks weird
-    this.colors.pop() // ON IMAGE Change
+    //this.colors.pop() // ON IMAGE Change
     //sides
     const rotated = this.colors[0].map((val, index) => this.colors.map(row => row[index]).reverse())
       .filter(row => this.getUnique(row).length > 1);
