@@ -1,0 +1,14 @@
+<!-- <div class="face face0"
+  style="width: 100px; height: 100px; position: absolute; left: 0px; top: 0px; box-sizing: border-box; transform-origin: 100% 50%; transform: translate3d(-100px, 0px, 0px) rotateY(-90deg); background-color: blue;">
+</div>
+<div class="face face2"
+  style="width: 100px; height: 100px; position: absolute; left: 0px; top: 0px; box-sizing: border-box; transform-origin: 50% 100%; transform: translate3d(0px, -100px, 0px) rotateX(90deg); background-color: cyan;">
+</div>
+<div class="face face4"
+  style="width: 100px; height: 100px; position: absolute; left: 0px; top: 0px; box-sizing: border-box; background-color: green;">
+</div> -->
+
+@for (f of cube.getFacesArr(); let i = $index; track 'face'+i) {
+<div [className]="'face face'+f.type" [ngStyle]="f.getStyles()">
+</div>
+}

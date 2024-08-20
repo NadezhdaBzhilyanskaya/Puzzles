@@ -22,6 +22,9 @@
     "@angular/router": "^18.0.0",
     "@angular/ssr": "^18.0.6",
     "express": "^4.18.2",
+    "get-pixels": "^3.3.3",
+    "jimp": "^0.22.12",
+    "png-js": "^1.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"

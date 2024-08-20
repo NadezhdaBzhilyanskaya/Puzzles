@@ -1,0 +1,22 @@
+<div class="container">
+  <div class="main" (mousedown)="dragStart($event)" (mousemove)="dragMove($event)" (mouseup)="mouse = 'UP'">
+    <h1>CSS 3D Rubik's cube</h1>
+    <button (click)="reset()">Reset</button>
+    <button (click)="rubik.reorient()">Reorient</button>
+    <!-- <button [disabled]="rubik.solved || rubik.solving || rubik.moving" (click)="rubik.attemptToSolveStart()">Try To
+      Solve</button> -->
+    <button (click)="rubik.attemptToSolveStart()">Try To
+      Solve</button>
+    <button [disabled]="!rubik.solving && !rubik.moving" (click)="rubik.stop()">Stop</button>
+    <button [disabled]="rubik.solving" (click)="rubik.randomize()">Random</button>
+    <button (click)="openFaceMatrix=!openFaceMatrix">{{openFaceMatrix? 'Close' : 'Open'}} Matrix</button>
+    <div class="outer" [ngStyle]="rubik.getStyles()">
+      @for (c of rubik.cubes; let i = $index; track i) {
+      <cube [className]="'cube'+i" [ngStyle]="c.getStyles()" [cube]="c" />
+      }
+    </div>
+  </div>
+</div>
+@if(openFaceMatrix){
+<face-matrix [matrix]="rubik.faceMatrix" />
+}

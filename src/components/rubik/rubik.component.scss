@@ -1,0 +1,70 @@
+.container,
+.main {
+  height: 100vh;
+  margin: 0px;
+  overflow: hidden;
+}
+
+.main {
+  background-color: #777;
+  color: white;
+  text-shadow: 0px 1px 1px black;
+  text-align: center;
+  font-family: sans-serif;
+  perspective: 460px;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 0px;
+  padding-top: 1em;
+}
+
+.foot {
+  position: fixed;
+  text-align: center;
+  width: 100%;
+  left: 0px;
+  bottom: 3px;
+  font-size: 90%;
+}
+
+a {
+  color: white;
+}
+
+.face {
+  border: 2px solid black;
+  border-radius: 10px;
+}
+
+.outer {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: 0px;
+  height: 0px;
+  transform-style: preserve-3d;
+
+  &.second {
+    margin-top: 10rem;
+  }
+}
+
+cube {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+face-matrix {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(4, 100px);
+  //background-color: #2196F3;
+  padding: 10px;
+  justify-content: space-evenly;
+  width: min-content;
+  top: 50px;
+  left: 50px;
+  position: absolute;
+}

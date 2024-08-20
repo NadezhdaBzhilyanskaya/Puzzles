@@ -1,0 +1,49 @@
+<div class="empty"></div>
+<div class="top" title="Top">
+  @for (topR of matrix[FaceType.Top]; let i = $index; track i+'topRow') {
+  @for (topC of topR; let j = $index; track j+'topCol') {
+  <div class="colorBlock" [ngStyle]="{'background-color':topC, 'grid-row': (i+1), 'grid-column': (j+1)}"></div>
+  }
+  }
+</div>
+<div class="empty"></div>
+<div class="empty"></div>
+<div class="front" title="Front">
+  @for (frontR of matrix[FaceType.Front]; let i = $index; track i+'frontRow') {
+  @for (frontC of frontR; let j = $index; track j+'frontCol') {
+  <div class="colorBlock" [ngStyle]="{'background-color':frontC, 'grid-row': (i+1), 'grid-column': (j+1)}"></div>
+  }
+  }
+</div>
+
+<div class="empty"></div>
+<div class="left" title="Left">
+  @for (leftR of matrix[FaceType.Left]; let i = $index; track i+'leftRow') {
+  @for (leftC of leftR; let j = $index; track j+'leftCol') {
+  <div class="colorBlock" [ngStyle]="{'background-color':leftC, 'grid-row': (i+1), 'grid-column': (j+1)}"></div>
+  }
+  }
+</div>
+<div class="bottom" title="Bottom">
+  @for (bottomR of matrix[FaceType.Bottom]; let i = $index; track i+'bottomRow') {
+  @for (bottomC of bottomR; let j = $index; track j+'bottomCol') {
+  <div class="colorBlock" [ngStyle]="{'background-color':bottomC, 'grid-row': (i+1), 'grid-column': (j+1)}"></div>
+  }
+  }
+</div>
+<div class="right" title="Right">
+  @for (rightR of matrix[FaceType.Right]; let i = $index; track i+'rightRow') {
+  @for (rightC of rightR; let j = $index; track j+'rightCol') {
+  <div class="colorBlock" [ngStyle]="{'background-color':rightC, 'grid-row': (i+1), 'grid-column': (j+1)}"></div>
+  }
+  }
+</div>
+<div class="empty"></div>
+<div class="back" title="Back">
+  @for (backR of matrix[FaceType.Back]; let i = $index; track i+'backRow') {
+  @for (backC of backR; let j = $index; track j+'backCol') {
+  <div class="colorBlock" [ngStyle]="{'background-color':backC, 'grid-row': (i+1), 'grid-column': (j+1)}"></div>
+  }
+  }
+</div>
+<div class="empty"></div>

@@ -1,0 +1,26 @@
+:host>div {
+  display: grid;
+
+  &:not(.empty) {
+    background: black;
+    gap: 1px;
+    border: 2px solid black;
+  }
+
+  &.top,
+  &.front {
+    border-bottom: none;
+  }
+
+  &.left {
+    border-right: none;
+  }
+
+  &.right {
+    border-left: none;
+  }
+
+  &.back {
+    border-top: none;
+  }
+}

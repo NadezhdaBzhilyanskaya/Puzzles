@@ -1,0 +1,52 @@
+<!-- <canvas id="canvas" height="1540" width="1150"></canvas> -->
+<!-- <img src="blockview.png" /> -->
+<canvas id="canvas"></canvas>
+@if(loaded){
+
+@for (row of colors; let x = $index; track "row"+x) {
+<div class="row">
+  @for (color of row; let y = $index; track "cell"+y+color.str ) {
+  <div
+    [ngClass]="{'cell': true, 'highlighted': color.str == highlighted,'hidden': !color.show, 'white': color.str == '#ffffff'}"
+    [ngStyle]="{'background-color': color.str}" (click)="onClick(color)">
+  </div>
+  }
+</div>
+}
+
+
+<!-- @for (sym of uniqueSym; let x = $index; track "sym"+x) {
+<div class="sym">
+  @for (row of sym; let x = $index; track "row"+x) {
+  <div class="row">
+    @for (color of row; let y = $index; track "cell"+y+color.str ) {
+    <div
+      [ngClass]="{'cell': true, 'highlighted': color.str == highlighted,'hidden': !color.show, 'white': color.str == '#ffffff'}"
+      [ngStyle]="{'background-color': color.str}" (click)="onClick(color)">
+    </div>
+    }
+  </div>
+  }
+</div>
+} -->
+
+
+
+<div class="colorCont">
+  @for (color of uniqueColors; let c = $index; track "color"+c) {
+  <div [ngClass]="{'color': true, 'highlighted': color.str == highlighted, 'hidden': !color.show}"
+    [title]="color.title || color.str" [ngStyle]="{'background-color':color.str}" (click)="onClick(color)">
+    {{color.count}}
+  </div>
+  }
+
+</div>
+<div class="options">
+  <div class="check">
+    <label ngFor="show">Hide Colors</label>
+    <input type="checkbox" id="show" name="show" [checked]="hide" (change)="hide = $event.target['checked']" />
+  </div>
+  <div class="color clear" (click)="highlighted = ''">Clear</div>
+</div>
+
+}

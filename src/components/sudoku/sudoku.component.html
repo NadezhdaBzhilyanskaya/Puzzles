@@ -1,0 +1,36 @@
+<div>
+  <div class='buttons'>
+    <button (click)="solve()">Solve</button>
+    <button (click)='step()'>Step</button>
+    <button (click)='clear()'>Clear</button>
+    <h4>{{status}}</h4>
+  </div>
+
+  <table>
+    <tbody>
+      @for (row of board; let r = $index; track "row"+r) {
+      <tr>
+        @for (cell of row; let c = $index; track "cell"+c) {
+        <td>
+          @if(cell !== 0){
+          <div class="set">
+            <p>{{cell}}</p>
+            <button (click)="setCell(0, r, c)">Change</button>
+          </div>
+          } @else{
+          <div>
+            <input type='number' class="enterNum" (change)="setCell($any($event.target).value,r,c)" /><br />
+            <div>
+              @for (option of getPossibilities(r, c); track "opt"+option) {
+              <span>{{option}}</span>
+              }
+            </div>
+          </div>
+          }
+        </td>
+        }
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
