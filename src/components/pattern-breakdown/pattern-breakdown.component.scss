@@ -16,6 +16,7 @@ canvas {
   display: flex;
   width: fit-content;
 
+
   &:nth-of-type(17) {
     margin-bottom: 2px;
   }
@@ -25,10 +26,20 @@ canvas {
     width: 3px;
     border: 1px solid black;
 
-    &.highlighted {
-      //height: 1px;
-      //width: 1px;
-      border: 1px solid yellow;
+    //undo
+
+    opacity: .4;
+
+    &:nth-child(n+3) {
+      opacity: unset;
+
+      &.highlighted {
+        //height: 1px;
+        //width: 1px;
+        border: 1px solid yellow;
+      }
+
+
     }
 
     &:nth-child(n+75),
@@ -55,6 +66,7 @@ canvas {
         border: 1px solid white !important;
         background-color: lightgray !important;
       }
+
     }
   }
 }
