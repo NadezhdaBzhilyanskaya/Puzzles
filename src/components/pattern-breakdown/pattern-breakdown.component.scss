@@ -16,9 +16,9 @@ canvas {
   display: flex;
   width: fit-content;
 
-  // &:nth-child(75) {
-  //   margin-bottom: 2px;
-  // }
+  &:nth-of-type(17) {
+    margin-bottom: 2px;
+  }
 
   .cell {
     height: 3px;
@@ -29,6 +29,11 @@ canvas {
       //height: 1px;
       //width: 1px;
       border: 1px solid yellow;
+    }
+
+    &:nth-child(n+75),
+    &:nth-child(n+75).hidden {
+      opacity: 0;
     }
 
     // ON SECTION Change
@@ -109,6 +114,10 @@ canvas {
 
 .options {
   margin-bottom: 1rem;
+
+  input[type="number"] {
+    width: 50px;
+  }
 
   .check {
     font-size: 10px;
