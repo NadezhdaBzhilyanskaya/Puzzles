@@ -28,29 +28,29 @@ canvas {
 
     //undo
 
-    opacity: .4;
+    // opacity: .4;
 
-    &:nth-child(n+3) {
-      opacity: unset;
+    // &:nth-child(n+4) {
+    //   opacity: unset;
 
-      &.highlighted {
-        //height: 1px;
-        //width: 1px;
-        border: 1px solid yellow;
-      }
-
-
+    &.highlighted {
+      //height: 1px;
+      //width: 1px;
+      border: 1px solid yellow;
     }
 
-    &:nth-child(n+75),
-    &:nth-child(n+75).hidden {
-      opacity: 0;
-    }
+
+    // }
+
+    // &:nth-child(n+75),
+    // &:nth-child(n+75).hidden {
+    //   opacity: 0;
+    // }
 
     // ON SECTION Change
-    &:nth-child(2),
-    &:nth-child(59),
-    &:nth-child(116) {
+    //&:nth-child(2),
+    &:nth-child(54),
+    &:nth-child(111) {
       margin-right: 2px;
       // border-right: 1px solid red !important;
     }
