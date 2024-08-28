@@ -111,7 +111,7 @@ export class PatternBreakdownComponent {
     this.removeBorder();
 
     // ON SECTION Change
-    if (this.imageName == 'test.png') this.colors = this.colors.slice(25, 131).map(r => r.slice(80, 191))//, 171))
+    if (this.imageName == 'test.png') this.colors = this.colors.slice(0, 151).map(r => r.slice(114))//, 171))
     this.uniqueColors = this.getUnique([].concat(...this.colors));
 
     this.uniqueColors.forEach(c => {
