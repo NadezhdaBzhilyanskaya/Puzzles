@@ -111,7 +111,7 @@ export class PatternBreakdownComponent {
     this.removeBorder();
 
     // ON SECTION Change
-    if (this.imageName == 'test.png') this.colors = this.colors.slice(45, 151).map(r => r.slice(60, 171))//, 171))
+    if (this.imageName == 'test.png') this.colors = this.colors.slice(25, 131).map(r => r.slice(80, 191))//, 171))
     this.uniqueColors = this.getUnique([].concat(...this.colors));
 
     this.uniqueColors.forEach(c => {
@@ -132,7 +132,7 @@ export class PatternBreakdownComponent {
       const cur = this.uniqueColors.find(x => x.str === tempStr);
       cur.show = !cur.show;
       this.colors.forEach(row => row.filter(x => x.str === tempStr).forEach(x => x.show = cur.show));
-      this.highlighted = null;
+      // this.highlighted = null;
       //   .forEach(x => {
       //   if(x.str === tempStr) c.show = false
       // })
@@ -321,7 +321,7 @@ export class PatternBreakdownComponent {
 
 
   getDMC(c: Color): string {
-    if (c.str == '#ffffff') return 'None';
+    if (c.str == '#ffffff' || c.str == '#fffdf9') return 'None';
     else if (c.str == '#4b4b49') return '535';
     else if (c.str == '#09092f') return '939';
     else if (c.str == '#3a3068') return '158';
