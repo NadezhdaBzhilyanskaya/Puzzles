@@ -55,7 +55,7 @@ canvas {
     }
 
 
-    &.hidden {
+    &.hidden:not(.highlighted) {
       // border: 1px solid lightgray !important;
       // background-color: white !important;
       opacity: .4;
