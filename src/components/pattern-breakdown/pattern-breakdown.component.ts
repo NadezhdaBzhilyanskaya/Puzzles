@@ -23,6 +23,7 @@ export class PatternBreakdownComponent {
   public loaded = false;
   public hide: boolean = false;
   public bumpStart: number = 0;
+  public minCount: number = 0;
 
   public Height = 300; // ON IMAGE Change
 
@@ -121,8 +122,13 @@ export class PatternBreakdownComponent {
         if (cell.str == c.str) c.count++;
       }))
     })
+    // give count
+    this.uniqueColors.forEach(c => {
+      this.colors.forEach(r => r.forEach(cell => {
+        if (cell.str == c.str) cell.count = c.count;
+      }))
+    })
     this.uniqueColors.sort((a, b) => (a.count ?? 0) - (b.count ?? 0));
-    console.log(this.uniqueColors)
     //console.log(FLOSS_LOOK_UP)
 
     this.loaded = true;

@@ -4,8 +4,10 @@
   <input type="file" (change)="update($event)" />
   <input type="number" [value]="Height" (change)="Height = $event.target['value']" />
   <input type="number" [value]="bumpStart" (change)="bumpStart = $event.target['value']" />
+  <input type="number" [value]="minCount" (change)="minCount = $event.target['value']" />
   <button (click)="updateImage()">Update</button>
 </div>
+
 <canvas id="canvas"></canvas>
 @if(loaded){
 
@@ -13,7 +15,7 @@
 <div class="row">
   @for (color of row; let y = $index; track "cell"+y+color.str ) {
   <div
-    [ngClass]="{'cell': true, 'highlighted': color.str == highlighted,'hidden': !color.show, 'white': color.dmc == 'None'}"
+    [ngClass]="{'cell': true, 'highlighted': color.str == highlighted,'hidden': !color.show || (color.count?? 0) <= (+minCount), 'white': color.dmc == 'None'}"
     [ngStyle]="{'background-color': color.str}" (click)="onClick(color)">
   </div>
   }
@@ -40,7 +42,8 @@
 
 <div class="colorCont">
   @for (color of uniqueColors; let c = $index; track "color"+c) {
-  <div [ngClass]="{'color': true, 'highlighted': color.str == highlighted, 'hidden': !color.show}"
+  <div
+    [ngClass]="{'color': true, 'highlighted': color.str == highlighted, 'hidden': !color.show || (color.count?? 0) <= (+minCount)}"
     [title]="color.title || color.str" [ngStyle]="{'background-color':color.str}" (click)="onClick(color)">
     {{color.count}}
   </div>
