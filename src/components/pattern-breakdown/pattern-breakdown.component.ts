@@ -23,7 +23,7 @@ export class PatternBreakdownComponent {
   public loaded = false;
   public hide: boolean = false;
   public bumpStart: number = 0;
-  public minCount: number = 3;
+  public minCount: number = 10;
 
   public Height = 300; // ON IMAGE Change
 
