@@ -23,7 +23,7 @@ export class PatternBreakdownComponent {
   public loaded = false;
   public hide: boolean = false;
   public bumpStart: number = 0;
-  public minCount: number = 17;
+  public minCount: number = 35;
 
   public Height = 300; // ON IMAGE Change
 
@@ -125,7 +125,14 @@ export class PatternBreakdownComponent {
     // give count
     this.uniqueColors.forEach(c => {
       this.colors.forEach(r => r.forEach(cell => {
-        if (cell.str == c.str) cell.count = c.count;
+        if (cell.str == c.str) {
+          // if (['#aea78e', '#a29b86', "#e0d7ee", "#667584", "#ad9994"].includes(cell.str)) {
+          //   cell.count = 1000;
+          //   c.count = 1000
+          // }
+          // else
+          cell.count = c.count;
+        }
       }))
     })
     this.uniqueColors.sort((a, b) => (a.count ?? 0) - (b.count ?? 0));
