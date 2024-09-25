@@ -23,7 +23,7 @@ export class PatternBreakdownComponent {
   public loaded = false;
   public hide: boolean = false;
   public bumpStart: number = 0;
-  public minCount: number = 35;
+  public minCount: number = 0;//35;
 
   public Height = 300; // ON IMAGE Change
 
@@ -112,8 +112,8 @@ export class PatternBreakdownComponent {
     this.removeBorder();
 
     // ON SECTION Change
-    if (this.imageName == 'test.png') this.colors = this.colors.slice(0, 151).map(r => r.slice(114))//, 171))
-    this.uniqueColors = this.getUnique([].concat(...this.colors))
+    if (this.imageName == 'test.png') this.colors = this.colors.slice(0, 151).map(r => r.slice(134))//, 171))
+    this.uniqueColors = this.getUnique([].concat(...this.colors.slice(75).map(r => r.slice(37))))
 
     this.uniqueColors.forEach(c => {
       //console.log(this.basicSim(c))
