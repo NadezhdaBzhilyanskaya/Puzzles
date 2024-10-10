@@ -12,7 +12,7 @@ interface Color { r: number, g: number, b: number, a: number, str: string; dmc: 
 })
 export class PatternBreakdownComponent {
   private flossDic: Record<string, Floss> = {};
-  public imageName: any = 'test.png';
+  public imageName: any = 'blockview.png';// ON IMAGE Change
   private img: HTMLImageElement;
   private context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
@@ -22,10 +22,10 @@ export class PatternBreakdownComponent {
   public highlighted: string = '';
   public loaded = false;
   public hide: boolean = false;
-  public bumpStart: number = 0;
+  public bumpStart: number = 1; // ON IMAGE Change
   public minCount: number = 0;//35;
 
-  public Height = 300; // ON IMAGE Change
+  public Height = 200; // ON IMAGE Change
 
   ngOnInit(): void {
     // setTimeout(() => {
@@ -65,7 +65,6 @@ export class PatternBreakdownComponent {
       this.img = new Image();
       this.canvas = document.getElementsByTagName('canvas')[0];
       this.context = this.canvas.getContext('2d');
-      //this.img.src = "blockview.png"; // ON IMAGE Change
       this.img.src = this.imageName;
 
       //this.loadImage()
@@ -88,7 +87,7 @@ export class PatternBreakdownComponent {
     console.log(this.img.height, this.img.width)
     const factor = Math.floor(this.img.height / this.Height);
     console.log(this.img.height, this.img.width, factor, this.bumpStart)
-    const begin = Number(this.bumpStart); // ON IMAGE Change
+    const begin = Number(this.bumpStart);
     for (let y = begin; y < this.img.height; y += factor) {
       const row: Color[] = [];
       for (let x = begin; x < this.img.width; x += factor) {
@@ -112,7 +111,7 @@ export class PatternBreakdownComponent {
     this.removeBorder();
 
     // ON SECTION Change
-    if (this.imageName == 'test.png') this.colors = this.colors.slice(0, 76).map(r => r.slice(171))//, 171))
+    //if (this.imageName == 'test.png') this.colors = this.colors.slice(0, 76).map(r => r.slice(171))//, 171))
     this.uniqueColors = this.getUnique([].concat(...this.colors))//.slice(75).map(r => r.slice(37))))
 
     this.uniqueColors.forEach(c => {

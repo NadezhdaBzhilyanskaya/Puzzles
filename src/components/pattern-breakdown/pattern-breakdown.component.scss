@@ -16,12 +16,27 @@ canvas {
   display: flex;
   width: fit-content;
 
-
-  &:nth-of-type(77) {
+  // ON SECTION Change
+  &:nth-of-type(84) {
     margin-bottom: 2px;
   }
 
   .cell {
+
+    // ON SECTION Change
+    &:nth-of-type(61),
+    &:nth-child(129) {
+      margin-right: 2px;
+      // border-right: 1px solid red !important;
+    }
+
+    // &:nth-child(n+75),
+    // &:nth-child(n+75).hidden {
+    //   opacity: 0;
+    // }
+
+
+
     height: 3px;
     width: 3px;
     border: 1px solid black;
@@ -39,20 +54,6 @@ canvas {
       border: 1px solid yellow;
     }
 
-
-    // }
-
-    // &:nth-child(n+75),
-    // &:nth-child(n+75).hidden {
-    //   opacity: 0;
-    // }
-
-    // ON SECTION Change
-    //&:nth-child(2),
-    // &:nth-child(37) {
-    //   margin-right: 2px;
-    //   // border-right: 1px solid red !important;
-    // }
 
 
     &.hidden:not(.highlighted) {
