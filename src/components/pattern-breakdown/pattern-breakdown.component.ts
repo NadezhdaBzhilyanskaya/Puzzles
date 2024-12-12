@@ -12,7 +12,7 @@ interface Color { r: number, g: number, b: number, a: number, str: string; dmc: 
 })
 export class PatternBreakdownComponent {
   private flossDic: Record<string, Floss> = {};
-  public imageName: any = 'blockview.png';// ON IMAGE Change
+  public imageName: any = 'hedge.png';// ON IMAGE Change
   private img: HTMLImageElement;
   private context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
@@ -25,7 +25,7 @@ export class PatternBreakdownComponent {
   public bumpStart: number = 1; // ON IMAGE Change
   public minCount: number = 0;//35;
 
-  public Height = 200; // ON IMAGE Change
+  public Height = 180; // ON IMAGE Change
 
   ngOnInit(): void {
     // setTimeout(() => {
