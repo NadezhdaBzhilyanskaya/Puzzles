@@ -2731,4 +2731,16 @@ export const FLOSS_LOOK_UP: Floss[] = [{
   r: 0,
   g: 0,
   b: 0
+},{
+  floss: 4,
+  name: "Dark Tin",
+  r: 	174,
+  g: 	174,
+  b: 177
+},{
+  floss: 23,
+  name: "Apple Blossom",
+  r: 237,
+  g: 226,
+  b: 237
 }];

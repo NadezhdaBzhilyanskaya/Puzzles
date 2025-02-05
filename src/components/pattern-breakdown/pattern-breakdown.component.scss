@@ -17,15 +17,16 @@ canvas {
   width: fit-content;
 
   // ON SECTION Change
-  &:nth-of-type(89) {
+  &:nth-of-type(92),
+  &:nth-of-type(187) {
     margin-bottom: 2px;
   }
 
   .cell {
 
     // ON SECTION Change
-    &:nth-of-type(54),
-    &:nth-child(119) {
+    &:nth-of-type(64),
+    &:nth-child(132) {
       margin-right: 2px;
       // border-right: 1px solid red !important;
     }

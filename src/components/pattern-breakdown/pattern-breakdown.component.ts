@@ -1,6 +1,8 @@
 import { NgClass, NgStyle } from '@angular/common';
 import { Component } from '@angular/core';
 import { FLOSS_LOOK_UP, Floss } from './floss';
+import kmeans from './kmeans';
+import { GUIDE } from './types';
 
 interface Color { r: number, g: number, b: number, a: number, str: string; dmc: string | number, title?: string; show: boolean, count?: number };
 @Component({
@@ -12,7 +14,7 @@ interface Color { r: number, g: number, b: number, a: number, str: string; dmc: 
 })
 export class PatternBreakdownComponent {
   private flossDic: Record<string, Floss> = {};
-  public imageName: any = 'hedge.png';// ON IMAGE Change
+  public imageName: any = 'blockview.png';// ON IMAGE Change
   private img: HTMLImageElement;
   private context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
@@ -24,8 +26,12 @@ export class PatternBreakdownComponent {
   public hide: boolean = false;
   public bumpStart: number = 1; // ON IMAGE Change
   public minCount: number = 0;//35;
+  // not important right now
+  public totalColors: number = 21;//35;
+  public imageProcessType: 'basic' | 'kmeans' | 'configAndSim' | 'self-fill' = 'basic';  // ON IMAGE Change (Maybe)
 
-  public Height = 180; // ON IMAGE Change
+  public Height = 226; // ON IMAGE Change
+  public Width = 200; // ON IMAGE Change
 
   ngOnInit(): void {
     // setTimeout(() => {
@@ -35,7 +41,7 @@ export class PatternBreakdownComponent {
     FLOSS_LOOK_UP.forEach(f => {
       const hex = this.rgbToHex(f.r, f.g, f.b);
       f.hex = hex;
-      this.flossDic[hex] = { ...f, hex };
+      this.flossDic[f.floss] = { ...f, hex };
     })
 
     this.updateImage();
@@ -85,13 +91,21 @@ export class PatternBreakdownComponent {
     //console.log(this.context.createImageData(this.img.width, this.img.height))
     this.imageData = this.context.getImageData(0, 0, this.img.width, this.img.height).data;
     console.log(this.img.height, this.img.width)
-    const factor = Math.floor(this.img.height / this.Height);
-    console.log(this.img.height, this.img.width, factor, this.bumpStart)
+    const factorY = this.img.height / this.Height;
+    const factorX = this.img.width / this.Width;
+    console.log(this.img.height, this.img.width, factorY, factorY, this.bumpStart, this.img.height / this.Height)
     const begin = Number(this.bumpStart);
-    for (let y = begin; y < this.img.height; y += factor) {
+
+    //const colorTemp = [];
+
+    for (let y = begin; y < this.img.height; y += factorY) {
       const row: Color[] = [];
-      for (let x = begin; x < this.img.width; x += factor) {
-        row.push(this.getPixelColor(x, y));
+      //const tempRow: Color[] = [];
+      for (let x = begin; x < this.img.width; x += factorX) {
+
+        const c = this.getPixelColor(Math.round(x), Math.round(y));
+        row.push(c);
+        //row.push(this.getBestMatch(c))
         //row.push(this.getBestMatch(this.getPixelColor(x, y)));
         // const factorSet = [];
         // for (let j = 0; j < factor && (j + y < this.img.height); j++) {
@@ -106,13 +120,25 @@ export class PatternBreakdownComponent {
         // row.push(this.test(this.getAverageColor(factorSet)));
       }
       this.colors.push(row);//.reverse());
+      //colorTemp.push(tempRow);//.reverse());
     }
+    console.log(this.colors.length, this.colors[0].length)
     //console.log(this.colors);
+    
+    //Maybe will be useful inn future
+    //Try to reassign colors
+   // this.fillColors();
+
+    //Clean up stuff
     this.removeBorder();
+
+    if(this.imageProcessType == 'kmeans') this.preformKmeansAnalysis()
+    else if(this.imageProcessType == 'configAndSim') this.fillColors();
 
     // ON SECTION Change
     //if (this.imageName == 'test.png') this.colors = this.colors.slice(0, 76).map(r => r.slice(171))//, 171))
-    this.uniqueColors = this.getUnique([].concat(...this.colors))//.slice(75).map(r => r.slice(37))))
+    this.generateUniqueColors();
+    console.log(this.uniqueColors.length)
 
     this.uniqueColors.forEach(c => {
       //console.log(this.basicSim(c))
@@ -122,9 +148,11 @@ export class PatternBreakdownComponent {
       }))
     })
     // give count
+    let temp = 0;
     this.uniqueColors.forEach(c => {
       this.colors.forEach(r => r.forEach(cell => {
         if (cell.str == c.str) {
+          if(cell.str !== "#ffffff") temp++;
           // if (['#aea78e', '#a29b86', "#e0d7ee", "#667584", "#ad9994"].includes(cell.str)) {
           //   cell.count = 1000;
           //   c.count = 1000
@@ -135,12 +163,12 @@ export class PatternBreakdownComponent {
       }))
     })
     this.uniqueColors.sort((a, b) => (a.count ?? 0) - (b.count ?? 0));
-    //console.log(FLOSS_LOOK_UP)
+    console.log(this.colors.length, this.colors[0].length, 'total: ',temp)
 
     this.loaded = true;
   }
 
-  public onClick(c: Color) {
+  public onClick(c: Color,i = -1,j=-1) {
     if (this.hide) {
       const tempStr = c.str;
       const cur = this.uniqueColors.find(x => x.str === tempStr);
@@ -156,8 +184,12 @@ export class PatternBreakdownComponent {
     else {
       this.highlighted = c.str;
     }
-    console.log('click', c)
+    console.log('click', c,i,j)
     //highlighted = color.str
+  }
+
+  private generateUniqueColors(){
+    this.uniqueColors = this.getUnique([].concat(...this.colors))//.slice(75).map(r => r.slice(37))))
   }
 
 
@@ -171,7 +203,6 @@ export class PatternBreakdownComponent {
       .filter(row => this.getUnique(row).length > 1);
     this.colors = rotated[0].map((val, index) => rotated.map(row => row[row.length - 1 - index]));
   }
-
 
   private getPixelColor(x, y): Color {
     const red = y * (this.img.width * 4) + x * 4;
@@ -189,20 +220,6 @@ export class PatternBreakdownComponent {
     temp.dmc = this.getDMC(temp);
 
     if (temp.dmc == 'None') temp.show = false;
-    return temp;
-  }
-
-  private getAverageColor(colors: Color[]): Color {
-    const temp = {
-      r: Math.round(colors.reduce((partialSum, a) => partialSum + a.r, 0) / colors.length),
-      g: Math.round(colors.reduce((partialSum, a) => partialSum + a.g, 0) / colors.length),
-      b: Math.round(colors.reduce((partialSum, a) => partialSum + a.b, 0) / colors.length),
-      a: Math.round(colors.reduce((partialSum, a) => partialSum + a.a, 0) / colors.length),
-      str: '',
-      dmc: '',
-      show: true
-    };
-    temp.str = this.colorToBackground(temp);
     return temp;
   }
 
@@ -225,6 +242,86 @@ export class PatternBreakdownComponent {
 
   private rgbToHex(r, g, b) {
     return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+  }
+
+
+//***************************************************** */
+  // Beyond this point things are kinda expiremental
+//***************************************************** */
+  
+  private fillColors(){
+
+    const colorOverride = Array(this.colors.length).fill(0).map(i => Array(this.colors[0].length).fill(undefined));
+    GUIDE.forEach((colorGuide,i) => {
+      const testColor = this.getAverageColor(colorGuide.colorSample.map(c => this.colors[c.i][c.j]));
+      //console.log(testColor);
+      //console.log(this.getColorSiimilarity(testColor,this.colors[38][90]))
+      const colorSims: {i:number,j:number,sim:number}[] = [];
+      this.colors.forEach((row,i) => row.forEach((cell,j) => {
+        if(!colorOverride[i][j])colorSims.push({i,j,sim: this.getColorSiimilarity(testColor,cell)})
+      }));
+    const picked = colorSims.sort((a,b) => a.sim-b.sim).slice(0,colorGuide.count);
+    let floss = this.flossDic[colorGuide.floss];
+    console.log(floss)//, this.flossDic)
+    const averagedColor = floss ? this.flossToColor(floss) : this.getAverageColor(picked.map(x => this.colors[x.i][x.j]));
+    picked.forEach(x => {
+      //reomve this 
+      this.colors[x.i][x.j] = JSON.parse(JSON.stringify(averagedColor));
+      //keep this
+      colorOverride[x.i][x.j] = JSON.parse(JSON.stringify(averagedColor));
+    })
+    this.highlighted = averagedColor.str;
+    })
+    // const numberOfColor = 176;
+    // const colorSample = [this.getColorFromRGB([68,100,59]), this.getColorFromRGB([92, 120,85])];
+    // const testGreen = this.getAverageColor(colorSample);
+    // console.log(testGreen);
+    // const colorSims: {i:number,j:number,sim:number}[] = [];
+    // this.colors.forEach((row,i) => row.forEach((cell,j) => {
+    //   colorSims.push({i,j,sim: this.getColorSiimilarity(testGreen,cell)})
+    // }));
+    // const picked = colorSims.sort((a,b) => a.sim-b.sim).slice(0,numberOfColor)
+    // picked.forEach(x => this.colors[x.i][x.j] = JSON.parse(JSON.stringify(testGreen)))
+    // this.highlighted = testGreen.str;
+    // console.log(picked)
+  }
+
+  private getColorFromRGB(arr: number[]): Color {
+    const temp = {
+      r: Math.round(arr[0]),
+      g: Math.round(arr[1]),
+      b: Math.round(arr[2]),
+      a: 255,
+      str: '',
+      dmc: '',
+      show: true
+    };
+    temp.str = this.colorToBackground(temp);
+    if (temp.str == 'None') temp.show = false;
+    temp.dmc = this.getDMC(temp);
+
+    if (temp.dmc == 'None') temp.show = false;
+    return temp;
+  }
+
+  private getAverageColor(colors: Color[]): Color {
+    const r = Math.round(colors.reduce((partialSum, a) => partialSum + a.r, 0) / colors.length);
+    const g = Math.round(colors.reduce((partialSum, a) => partialSum + a.g, 0) / colors.length);
+    const b = Math.round(colors.reduce((partialSum, a) => partialSum + a.b, 0) / colors.length);
+    return this.getColorFromRGB([r,g,b])
+  }
+
+  private getNoneColor(): Color{
+    return {
+      r: 255,
+      g: 255,
+      b: 255,
+      a: 255,
+      count: 0,
+      dmc: "None",
+      show: false,
+      str: "#ffffff"
+    };
   }
 
   // getBestMatch(c: Color): Color {
@@ -253,10 +350,116 @@ export class PatternBreakdownComponent {
   //   console.log(max, bestFloss,);
   // }
 
+  private flossToColor(floss:Floss): Color{
+       return {
+          r: floss.r,
+          g: floss.g,
+          b: floss.b,
+          a: 255,
+          str: floss.hex ?? '',
+          dmc: floss.floss,
+          title: floss.name,
+          show: ![floss.r, floss.g, floss.b].every(a => a == 255)
+        }
+  }
+
+
+  private preformKmeansAnalysis(){
+    console.log(this.colors.length*this.colors[0].length)
+    const sample = Array(100).fill(1).map(i => {
+      const y = Math.floor(Math.random()*this.colors.length);
+      const x =Math.floor(Math.random()*this.colors[0].length);
+      return({ y,x,
+      color: this.colors[y][x]
+    })
+  });
+  console.log(sample)
+  this.generateUniqueColors();
+    const uniqueColorsArray = this.uniqueColors.map(c => [c.r,c.g,c.b]);
+    //const possible = [4, 23, 351,415,610,739,758, 814, 817,841, 930, 931,932,950,987,3042,3371,3841,3864, "B5200", "White"];
+    //console.log(possible.length)
+    //const centroids = FLOSS_LOOK_UP.filter(f => possible.includes(f.floss)).map(c => [c.r,c.g,c.b]);
+    const k = kmeans(uniqueColorsArray, this.totalColors)//, centroids);
+    const tempColors = Array(this.colors.length).fill(0).map(i => Array(this.colors[0].length).fill(undefined));
+    this.uniqueColors = [];
+    console.log(k)
+   k.clusters.forEach(cluster =>{
+    
+    let newColor: Color = this.getColorFromRGB(cluster.centroid);
+    
+
+   // console.log(cluster.points)
+    this.colors.forEach((row,i) => 
+      row.forEach((cell,j) => {
+        const pointStrings = cluster.points.map(p => JSON.stringify(p))
+        if(!tempColors[i][j] && (pointStrings.includes(JSON.stringify([cell.r, cell.g, cell.b])))){
+          //if(i == 0 && j==0) newColor = this.getColorFromRGB([255,255,255]);
+          //console.log('test', [cell.r, cell.g, cell.b], i,j)
+          tempColors[i][j] = JSON.parse(JSON.stringify(newColor));
+        }
+      //if (cell.str == c.str) c.count++;
+    }))
+
+    this.uniqueColors.push(JSON.parse(JSON.stringify(newColor)));
+    //cluster.points
+    //console.log(cluster.points,tempColors)
+   }); 
+   this.colors = tempColors;
+   console.log(tempColors)
+   this.removeBorder();
+    //console.log(k)
+// // execute clustering using dataset
+
+// kmeans.cluster(uniqueColorsArray, function (err, clusters, centroids) {
+//    // show any errors
+//    console.log(err);
+// // show the clusters founds
+//    console.log(clusters);
+// // show the centroids
+//    console.log(centroids);
+// });
+//     let min = Math.pow(255, 2) * 3;
+//     let retVal = 'None';
+//     ///const possible = [4, 23, 351,415,610,739,758, 814, 817,841, 930, 931,932,950,987,3042,3371,3841,3864, "Snow White", "White"];
+//     //FLOSS_LOOK_UP.filter(f => possible.includes(f.floss)).forEach(f => {
+//       this.uniqueColors.forEach((a,i) => {
+//         this.uniqueColors.forEach((b,j)=> {
+//           if(i !== j) {
+            
+//             const sim = Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2);
+//             console.log(i, j, sim);
+//  if (sim < min) {
+//         min = sim;
+//         retVal = 'Indexes '+i+' and '+j+' is '+sim;
+//         console.log(i, j, sim);
+//         //bestFloss = f;
+//       }
+//           }
+        
+//         })
+
+//       //})
+//       // this.uniqueColors.forEach(f => {
+//       // const sim = Math.pow(c.r - f.r, 2) + Math.pow(c.g - f.g, 2) + Math.pow(c.b - f.b, 2);
+//       // if (sim < min) {
+//       //   min = sim;
+//       //   bestFloss = f;
+//       // }
+//     });
+//     return 
+
+  }
+
+  private getColorSiimilarity(a:Color, b:Color): number{
+    return Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2);
+  }
+
   private getBestMatch(c: Color): Color {
     let min = Math.pow(255, 2) * 3;
     let bestFloss: Floss;
-    FLOSS_LOOK_UP.forEach(f => {
+    //const possible = [4, 23, 351,415,610,739,758, 814, 817,841, 930, 931,932,950,987,3042,3371,3841,3864, "Snow White", "White"];
+    //FLOSS_LOOK_UP.filter(f => possible.includes(f.floss)).forEach(f => {
+      FLOSS_LOOK_UP.forEach(f => {
       const sim = Math.pow(c.r - f.r, 2) + Math.pow(c.g - f.g, 2) + Math.pow(c.b - f.b, 2);
       if (sim < min) {
         min = sim;

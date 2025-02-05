@@ -16,7 +16,7 @@
   @for (color of row; let y = $index; track "cell"+y+color.str ) {
   <div
     [ngClass]="{'cell': true, 'highlighted': color.str == highlighted,'hidden': !color.show || (color.count?? 0) <= (+minCount), 'white': color.dmc == 'None'}"
-    [ngStyle]="{'background-color': color.str}" (click)="onClick(color)">
+    [ngStyle]="{'background-color': color.str}" (click)="onClick(color,x,y)">
   </div>
   }
 </div>
