@@ -1,0 +1,65 @@
+<h2>Get Borders</h2>
+@if(downloadableFile){
+  <a [href]="downloadableFile.url" [download]="downloadableFile.name">Download File</a>
+}
+
+@switch (currentStep) {
+  @case (FillSteps.Loading) {
+    <p>Loading </p>
+  }
+    @case (FillSteps.UploadImage) {
+      <p>Please upload an Image and make sure the width anf height are inputted correctly </p>
+    }
+    @case (FillSteps.GetBorderOffsets) {
+
+        <p>Enter Number of row/columns the edge is offset by from the border of the pattern:</p>
+        <div class="cornerDisplay">
+            <pattern-display class="pattern-display-topLeft" [colors]="corners.topLeft"/>
+            <pattern-display class="pattern-display-top" [colors]="corners.top"/>
+            <pattern-display class="pattern-display-topRight" [colors]="corners.topRight"/>
+            <pattern-display class="pattern-display-left"[colors]="corners.left"/>
+            <div class="borderOffsetInput">
+               <div class="top"><label>Top:</label><input type="number" min="0" [value]="borders.top" (change)="changeBorder($event,'top')"/></div>
+               <div class="mid">
+                    <div class="left"><label>Left:</label><input type="number" min="0" [value]="borders.left" (change)="changeBorder($event,'left')"></div>
+                    <div class="right"><label>Right:</label><input type="number" min="0" [value]="borders.right" (change)="changeBorder($event,'right')"/></div>
+                </div>
+               <div class="bot"><label>Bottom:</label><input type="number" min="0" [value]="borders.bottom" (change)="changeBorder($event,'bottom')"/></div>
+               <div class="confirm"><button (click)="confirmBorder()">Confirm</button></div>
+            </div>
+            <pattern-display class="pattern-display-right" [colors]="corners.right"/>
+            <pattern-display class="pattern-display-botLeft" [colors]="corners.botLeft"/>
+            <pattern-display class="pattern-display-bot" [colors]="corners.bot"/>
+            <pattern-display class="pattern-display-botRight" [colors]="corners.botRight"/>
+        </div>
+
+    }
+    @case (FillSteps.GetInsideOffset) {
+
+        <p>Inner Offset</p>
+        <pattern-display class="cellDisplay" [colors]="display"/>
+        <div class="insideStart"><label>Start:</label><input type="number" min="0" [value]="borders.insideStart" (change)="changeBorder($event,'insideStart')"/></div> 
+        <div class="insideEnd"><label>End:</label><input type="number" min="0" [value]="borders.insideEnd" (change)="changeBorder($event,'insideEnd')"/></div> 
+        <button (click)="displayRandomCell()">Get New Random Cell</button> 
+        <button (click)="confirmInsideOffset()">Confirm</button>
+
+    }
+    @case (FillSteps.CombiningColors) {
+
+        <p>Combining Colors</p>
+        <p>Total Colors: {{uniqueColors.length}}</p>
+        <button (click)="combineCurrent()">Combine Current Selections</button> 
+        <button (click)="createFile()">Create File</button> 
+        <pattern-display class="cellDisplay" [colors]="display" (clicked)="toggleHighlight($event.color.str)"/>
+        
+        <!-- <div class="insideStart"><label>Start:</label><input type="number" min="0" [value]="borders.insideStart" (change)="changeBorder($event,'insideStart')"/></div> 
+        <div class="insideEnd"><label>End:</label><input type="number" min="0" [value]="borders.insideEnd" (change)="changeBorder($event,'insideEnd')"/></div> 
+        <button (click)="displayRandomCell()">Get New Random Cell</button> 
+        <button>Confirm</button> -->
+        <color-list [colors]="uniqueColors" (clicked)="toggleHighlight($event.str)"/>
+
+    }
+    @default {
+      This shouldn't happen
+    }
+  }

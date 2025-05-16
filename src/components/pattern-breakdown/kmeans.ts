@@ -1,4 +1,4 @@
-const MAX_ITERATIONS = 50;
+const MAX_ITERATIONS = 100;
 
 function randomBetween(min, max) {
   return Math.floor(
@@ -37,6 +37,7 @@ function getRandomCentroidsNaiveSharding(dataset, k) {
     }
     centroids.push(calcMeanCentroid(dataset, start, end));
   }
+  console.log(centroids)
   return centroids;
 }
 
@@ -166,7 +167,7 @@ function recalculateCentroids(dataSet, labels, k) {
   return newCentroidList;
 }
 
-function kmeans(dataset: number[][], k: number, useNaiveSharding = true) {
+export function kmeans(dataset: number[][], k: number, useNaiveSharding = true) {
   if (dataset.length && dataset[0].length && dataset.length > k) {
     // Initialize book keeping variables
     let iterations = 0;
@@ -206,4 +207,39 @@ function kmeans(dataset: number[][], k: number, useNaiveSharding = true) {
   }
 }
 
-export default kmeans;
+export function kmeansGivenCentroids(dataset: number[][], centroids: number[][]){
+  if (dataset.length && dataset[0].length && dataset.length > centroids.length) {
+    // Initialize book keeping variables
+    let iterations = 0;
+    let oldCentroids, labels;
+    const k = centroids.length;
+
+
+    // Run the main k-means algorithm
+    while (!shouldStop(oldCentroids, centroids, iterations)) {
+      // Save old centroids for convergence test.
+      oldCentroids = [...centroids];
+      iterations++;
+
+      // Assign labels to each datapoint based on centroids
+      labels = getLabels(dataset, centroids);
+      centroids = recalculateCentroids(dataset, labels, k);
+    }
+
+    const clusters = [];
+    for (let i = 0; i < k; i++) {
+      clusters.push(labels[i]);
+    }
+    const results = {
+      clusters: clusters,
+      centroids: centroids,
+      iterations: iterations,
+      converged: iterations <= MAX_ITERATIONS,
+    };
+    return results;
+  } else {
+    throw new Error('Invalid dataset');
+  }
+
+}
+

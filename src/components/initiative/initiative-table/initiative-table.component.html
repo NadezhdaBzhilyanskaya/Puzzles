@@ -1,0 +1,21 @@
+<h2>Initiative Tracker</h2>
+<initiative-input-form />
+<table>
+    <tbody>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Initiative</th>
+            <th>Turn</th>
+            <th>HP</th>
+            <th></th>
+        </tr>
+        @if(rows.length === 0){
+            <tr><td colspan="6">None</td></tr>
+        } @else{
+            @for (row of rows; let i = $index; track "row"+i) {
+                <initiative-row [row]="row"/>
+            }
+        }  
+    </tbody>
+  </table>

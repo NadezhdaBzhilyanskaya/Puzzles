@@ -1,0 +1,59 @@
+<div>
+    <label for="name" [ngClass]="{'error': errorFields.includes('name')}">Name:&nbsp;</label>
+  <input type="text" name="name" id="name"  [(ngModel)]="inputs.name"/>
+</div>
+<div>
+    <label for="amount" [ngClass]="{'error': errorFields.includes('amount')}">Number of:&nbsp;</label>
+  <input type="text" name="amount" id="amount" [(ngModel)]="inputs.amount"/>
+</div>
+<div>
+    <label for="initative" [ngClass]="{'error': errorFields.includes('initiative')}">Initiative:&nbsp;</label>
+  <input type="text" name="initiative" id="initative" [(ngModel)]="inputs.initiative"/>
+</div>
+<div>
+    <label for="ac" [ngClass]="{'error': errorFields.includes('ac')}">Armor Class:&nbsp;</label>
+  <input type="text" name="ac" id="ac" [(ngModel)]="inputs.ac"/>
+</div>
+<div>
+    <label for="abilities" [ngClass]="{'errorArray': errorFields.includes('abilities')}">Abilities:&nbsp;</label>
+    @for(item of modOrder; track item){
+        <input type="text" 
+        name="{{ item }}A" id="{{ item }}A" 
+        placeholder="{{ item | titlecase}}" 
+        [(ngModel)]="inputs.abilities[item]"
+        (change)="modifierCalc(item)"/>
+     } 
+</div>
+<div>
+    <label for="mod" [ngClass]="{'errorArray': errorFields.includes('mod')}">Modifier:&nbsp;</label>
+    @for(item of modOrder; track item){
+        <input type="text" name="{{ item }}M" id="{{ item }}M" placeholder="{{ item | titlecase}}" [(ngModel)]="inputs.mod[item]"/>
+     } 
+</div>
+<div>
+    <label for="saving" [ngClass]="{'errorArray': errorFields.includes('save')}">Save:&nbsp;</label>
+    @for(item of modOrder; track item){
+        <input type="text" name="{{ item }}S" id="{{ item }}S" placeholder="{{ item | titlecase}}" [(ngModel)]="inputs.save[item]"/>
+     } 
+</div>
+<div>
+    <label for="hp" [ngClass]="{'error': errorFields.includes('hp')}">HP:&nbsp;</label>
+  <input type="text" name="hp" id="hp" [(ngModel)]="inputs.hp"/>
+</div>
+<div>
+    <label for="notes" [ngClass]="{'errorArray': errorFields.includes('attacks')}">Attacks:&nbsp;</label><button (click)="addAttack()">+</button>
+    @for(attack of inputs.attacks; let i = $index; track i){
+        <div class="attackItem">
+            <input type="text" name="attackName" id="attackName"  [(ngModel)]="attack.name"/>
+            <input type="text" name="toHit" id="toHit" placeholder="To Hit" [(ngModel)]="attack.toHit"/>
+            <input type="text" name="dmg" id="dmg" placeholder="Damage" [(ngModel)]="attack.damage"/>
+            <button (click)="deleteAttack(i)">Delete</button>
+        </div>
+    }
+</div>
+
+
+<button (click)="add()">Add</button>
+
+
+

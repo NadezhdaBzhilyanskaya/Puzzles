@@ -1,37 +1,52 @@
 import { NgClass, NgStyle } from '@angular/common';
 import { Component } from '@angular/core';
 import { FLOSS_LOOK_UP, Floss } from './floss';
-import kmeans from './kmeans';
-import { GUIDE } from './types';
+import {kmeans, kmeansGivenCentroids} from './kmeans';
+import { Color, GUIDE } from './types';
+import { PatternDisplayComponent } from './pattern-display/pattern-display.component';
+import { FillFromPatternComponent } from './fill-from-pattern/fill-from-pattern.component';
+import *  as Utils from './utils';
+import { ColorListComponent } from './color-list/color-list.component';
+import patternJSON from '../../../public/patternOutput.json';
 
-interface Color { r: number, g: number, b: number, a: number, str: string; dmc: string | number, title?: string; show: boolean, count?: number };
+enum ImageProcessingType { Basic, Kmeans, ConfigAndSim, SelfFill, FromFile};
+
 @Component({
   selector: 'pattern-breakdown',
   standalone: true,
-  imports: [NgStyle, NgClass],
+  imports: [ColorListComponent, PatternDisplayComponent, FillFromPatternComponent],
   templateUrl: './pattern-breakdown.component.html',
   styleUrl: './pattern-breakdown.component.scss'
 })
 export class PatternBreakdownComponent {
+  public ImageProcessingType: typeof ImageProcessingType = ImageProcessingType;
+
   private flossDic: Record<string, Floss> = {};
-  public imageName: any = 'blockview.png';// ON IMAGE Change
-  private img: HTMLImageElement;
-  private context: CanvasRenderingContext2D;
+  public imageName: any = 'a.png';// ON IMAGE Change
+  public img: HTMLImageElement;
+  public context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
-  private imageData: Uint8ClampedArray;
+  public imageData: Uint8ClampedArray;
   public colors: Color[][] = [];
   public uniqueColors: Color[] = [];
-  public highlighted: string = '';
   public loaded = false;
   public hide: boolean = false;
+  public selectingColorsForCentroid: boolean = false;
+  public selectedCentroidsColors: Color[][];
+  public selectedCentroids: number[][];
+  public PIXELS_PER_CENTROID = 3;
   public bumpStart: number = 1; // ON IMAGE Change
   public minCount: number = 0;//35;
+  private factorX: number = 1;// count numbers per square X
+  private factorY: number = 1;// count numbers per square Y
   // not important right now
-  public totalColors: number = 21;//35;
-  public imageProcessType: 'basic' | 'kmeans' | 'configAndSim' | 'self-fill' = 'basic';  // ON IMAGE Change (Maybe)
+  public totalColors: number = 28;//35;
+  public imageProcessType: ImageProcessingType = ImageProcessingType.FromFile;  // ON IMAGE Change (Maybe)
 
-  public Height = 226; // ON IMAGE Change
-  public Width = 200; // ON IMAGE Change
+  private borders = {top: 2, left: 1, right: 2,bottom:0, insideStart: 2, insideEnd: 3};
+
+  public height = 200; // ON IMAGE Change
+  public width = 200; // ON IMAGE Change
 
   ngOnInit(): void {
     // setTimeout(() => {
@@ -39,12 +54,13 @@ export class PatternBreakdownComponent {
     //this.img = document.getElementsByTagName('img')[0];
 
     FLOSS_LOOK_UP.forEach(f => {
-      const hex = this.rgbToHex(f.r, f.g, f.b);
+      const hex = Utils.rgbToHex(f.r, f.g, f.b);
       f.hex = hex;
       this.flossDic[f.floss] = { ...f, hex };
     })
 
-    this.updateImage();
+    if(this.imageProcessType === ImageProcessingType.FromFile) this.loadFromFile();
+    else this.updateImage();
 
   }
 
@@ -91,17 +107,17 @@ export class PatternBreakdownComponent {
     //console.log(this.context.createImageData(this.img.width, this.img.height))
     this.imageData = this.context.getImageData(0, 0, this.img.width, this.img.height).data;
     console.log(this.img.height, this.img.width)
-    const factorY = this.img.height / this.Height;
-    const factorX = this.img.width / this.Width;
-    console.log(this.img.height, this.img.width, factorY, factorY, this.bumpStart, this.img.height / this.Height)
+    this.factorY = this.img.height / this.height;
+    this.factorX = this.img.width / this.width;
+    console.log(this.img.height, this.img.width, this.factorY, this.factorY, this.bumpStart, this.img.height / this.height)
     const begin = Number(this.bumpStart);
 
     //const colorTemp = [];
 
-    for (let y = begin; y < this.img.height; y += factorY) {
+    for (let y = begin; y < this.img.height; y += this.factorY) {
       const row: Color[] = [];
       //const tempRow: Color[] = [];
-      for (let x = begin; x < this.img.width; x += factorX) {
+      for (let x = begin; x < this.img.width; x += this.factorX) {
 
         const c = this.getPixelColor(Math.round(x), Math.round(y));
         row.push(c);
@@ -122,7 +138,7 @@ export class PatternBreakdownComponent {
       this.colors.push(row);//.reverse());
       //colorTemp.push(tempRow);//.reverse());
     }
-    console.log(this.colors.length, this.colors[0].length)
+    //console.log(JSON.parse(JSON.stringify(this.colors[0][0])),this.colors.length, this.colors[0].length)
     //console.log(this.colors);
     
     //Maybe will be useful inn future
@@ -132,44 +148,61 @@ export class PatternBreakdownComponent {
     //Clean up stuff
     this.removeBorder();
 
-    if(this.imageProcessType == 'kmeans') this.preformKmeansAnalysis()
-    else if(this.imageProcessType == 'configAndSim') this.fillColors();
+    if(this.imageProcessType == ImageProcessingType.Kmeans) this.preformKmeansAnalysis()
+    // else if(this.imageProcessType == 'self-fill-kmeans') {
+    //   this.loaded = true;
+    //   this.selectedCentroidsColors = [];
+    //   console.log(this.selectedCentroidsColors)
+    //   this.selectingColorsForCentroid = true;
+    //   return;
+    // }
+    else if(this.imageProcessType == ImageProcessingType.ConfigAndSim) this.fillColors();
+    //else if(this.imageProcessType == 'self-fill') this.calcAverages();
 
-    // ON SECTION Change
-    //if (this.imageName == 'test.png') this.colors = this.colors.slice(0, 76).map(r => r.slice(171))//, 171))
-    this.generateUniqueColors();
-    console.log(this.uniqueColors.length)
+   this.uniqueColors = Utils.loadUniqueColors(this.colors);
+   this.loaded = true;
+  }
 
-    this.uniqueColors.forEach(c => {
-      //console.log(this.basicSim(c))
-      c.count = 0;
-      this.colors.forEach(r => r.forEach(cell => {
-        if (cell.str == c.str) c.count++;
-      }))
-    })
-    // give count
-    let temp = 0;
-    this.uniqueColors.forEach(c => {
-      this.colors.forEach(r => r.forEach(cell => {
-        if (cell.str == c.str) {
-          if(cell.str !== "#ffffff") temp++;
-          // if (['#aea78e', '#a29b86', "#e0d7ee", "#667584", "#ad9994"].includes(cell.str)) {
-          //   cell.count = 1000;
-          //   c.count = 1000
-          // }
-          // else
-          cell.count = c.count;
-        }
-      }))
-    })
-    this.uniqueColors.sort((a, b) => (a.count ?? 0) - (b.count ?? 0));
-    console.log(this.colors.length, this.colors[0].length, 'total: ',temp)
-
+  public loadFromFile(){
+    this.colors = patternJSON;
+    this.uniqueColors = Utils.loadUniqueColors(this.colors);
     this.loaded = true;
   }
 
-  public onClick(c: Color,i = -1,j=-1) {
-    if (this.hide) {
+  public onClick(c: Color, x: number = -1, y: number = -1) {
+    if(this.selectingColorsForCentroid){
+      if(this.selectedCentroidsColors.length == this.totalColors && this.selectedCentroidsColors[this.selectedCentroidsColors.length-1].length == this.PIXELS_PER_CENTROID-1){
+        this.selectedCentroidsColors[this.selectedCentroidsColors.length-1].push(c);
+
+        console.log('Done', this.selectedCentroidsColors)
+       this.selectedCentroids = this.selectedCentroidsColors.map(centroid => {
+          console.log(centroid, Utils.getAverageColorAsArr(centroid));
+          return Utils.getAverageColorAsArr(centroid);
+        });
+        console.log(this.selectedCentroids)
+        this.colors.forEach(r => r.forEach(cell => delete cell.count))
+        this.selectingColorsForCentroid = false;
+        this.loaded = false;
+        this.preformKmeansAnalysis();
+        console.log(this.colors)
+        this.uniqueColors = Utils.loadUniqueColors(this.colors);
+        this.loaded = true;
+       console.log(this.colors);
+
+      }
+      else if(this.selectedCentroidsColors.length <= this.totalColors){
+        if(!this.selectedCentroidsColors.length || this.selectedCentroidsColors[this.selectedCentroidsColors.length-1].length === this.PIXELS_PER_CENTROID){
+          this.selectedCentroidsColors.push([c]);
+        } else {
+          this.selectedCentroidsColors[this.selectedCentroidsColors.length-1].push(c);
+        }
+      }
+      else {
+        console.log('Error:', this.selectedCentroidsColors)
+      }
+      //console.log(this.selectedCentroidsColors)
+    }
+    else if (this.hide) {
       const tempStr = c.str;
       const cur = this.uniqueColors.find(x => x.str === tempStr);
       cur.show = !cur.show;
@@ -180,16 +213,32 @@ export class PatternBreakdownComponent {
       // })
       // this.uniqueColors.filter(x => x.str === tempStr).forEach(x => )
     }
-    else if (this.highlighted == c.str) this.highlighted = null;
     else {
-      this.highlighted = c.str;
+      this.toggleHighlight(c.str);
     }
-    console.log('click', c,i,j)
+    console.log('click', c,x,y,)
     //highlighted = color.str
   }
 
-  private generateUniqueColors(){
-    this.uniqueColors = this.getUnique([].concat(...this.colors))//.slice(75).map(r => r.slice(37))))
+
+  public clearHighlight(){
+    this.colors.forEach(row => row.forEach(c => {
+      c.highlighted = false;
+      c.show = ![c.r, c.g, c.b].every(a => a == 255);
+    }));
+    this.uniqueColors.forEach(c => {
+      c.highlighted = false;
+      c.show = ![c.r, c.g, c.b].every(a => a == 255);
+    });
+  }
+
+  private toggleHighlight(str: string){
+    this.colors.forEach(row => row.forEach(c => {
+      if(c.str == str) c.highlighted =!c.highlighted;
+    }))
+    this.uniqueColors.forEach(c => {
+      if(c.str == str) c.highlighted = !c.highlighted;
+    });
   }
 
 
@@ -205,28 +254,7 @@ export class PatternBreakdownComponent {
   }
 
   private getPixelColor(x, y): Color {
-    const red = y * (this.img.width * 4) + x * 4;
-    const temp = {
-      r: this.imageData[red],
-      g: this.imageData[red + 1],
-      b: this.imageData[red + 2],
-      a: this.imageData[red + 3],
-      str: '',
-      dmc: '',
-      show: true
-    };
-    temp.str = this.colorToBackground(temp);
-    if (temp.str == 'None') temp.show = false;
-    temp.dmc = this.getDMC(temp);
-
-    if (temp.dmc == 'None') temp.show = false;
-    return temp;
-  }
-
-  private colorToBackground(c: Color): string {
-    return this.rgbToHex(c.r, c.g, c.b);
-    //return `rgb(${c.r}, ${c.g}, ${c.b})`
-    //return `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a})`
+    return Utils.getPixelColor(this.imageData, this.img.width,x,y);
   }
 
   private getUnique(a: Color[]): Color[] {
@@ -234,43 +262,109 @@ export class PatternBreakdownComponent {
     return a.filter((item, i) => temp.indexOf(JSON.stringify(item)) === i);
   }
 
-  private componentToHex(c) {
-    var hex = c.toString(16);
-    return hex.length == 1 ? "0" + hex : hex;
-  }
-
-
-  private rgbToHex(r, g, b) {
-    return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
-  }
 
 
 //***************************************************** */
   // Beyond this point things are kinda expiremental
 //***************************************************** */
   
+public test(e: any){console.log(e)}
+private calcAverages(){
+  //const borders = {top: 2, left: 1, right: 2,bottom:0, inside: 2};
+  this.img.width = this.img.width-this.borders.left-this.borders.right;
+  this.img.height = this.img.height-this.borders.top-this.borders.bottom;
+  this.factorY = this.img.height / this.height;
+  this.factorX =  this.img.width / this.width;
+  this.imageData = this.context.getImageData(this.borders.left, this.borders.top, this.img.width,this.img.height).data;
+  
+  // this.img.height = imgHeight;
+  // this.img.width = imgWidth;
+  //console.log('hi', JSON.parse(JSON.stringify(this.colors.slice(0,  Math.round(this.factorY)).map(row => row.slice(0, Math.round(this.factorX))))))
+
+  this.colors = [];
+
+  for(let i = 0; i < this.height;i++){
+    const row: Color[] = [];
+    for(let j = 0; j < this.width;j++){
+      row.push(this.getCellAverageColor(j,i));
+    }
+    //console.log('row:', i, 'Done')
+    this.colors.push(row);
+  }
+  console.log(this.colors)
+ // this.preformKmeansAnalysis()
+ 
+ // TODO use for IDentifying borders
+//   const tempColors = [];
+//  for (let i = (this.factorY*0)+this.borders.insideStart; i < (this.factorY*(1+1))-this.borders.insideEnd; i++) {
+//   const row: Color[] = [];
+//   for (let j = (this.factorX*49)+this.borders.insideStart; j < (this.factorX*(50+1))-this.borders.insideEnd; j++) {
+//  // for (let y = 0; y < this.factorY*(1); y++) {
+//   //for (let y = Math.round(this.img.height-(this.factorY*3)); y < this.img.height; y++) {
+
+//     //const tempRow: Color[] = [];
+//     //for (let x = Math.round(this.img.width-(this.factorX*3)); x < this.img.width; x++) {
+//     //for (let x = 0; x < this.factorX*1; x++) {
+
+//      // console.log(x,y)
+//       const c = this.getPixelColor(j,i);
+//       row.push(c);
+//     }
+//     tempColors.push(row)
+//   }
+//   this.colors = tempColors;
+//   console.log(tempColors)
+ // this.tempForDisplay(Math.floor(Math.random()*this.width),Math.floor(Math.random()*this.height))
+
+}
+
+private getCellAverageColor(x:number,y: number): Color{
+  const tempColors: Color[] = [];
+  for (let i = (this.factorY*y)+this.borders.insideStart; i < (this.factorY*(y+1))-this.borders.insideEnd; i++) {
+    for (let j = (this.factorX*x)+this.borders.insideStart; j < (this.factorX*(x+1))-this.borders.insideEnd; j++) {
+      tempColors.push(this.getPixelColor(Math.round(j),Math.round(i)));
+    }
+  }
+  //console.log(tempColors)
+  return Utils.getAverageColor(tempColors);
+
+}
+
+private tempForDisplay(x:number,y: number){
+  const tempColors: Color[][] = [];
+  for (let i = (this.factorY*y)+this.borders.insideStart; i < (this.factorY*(y+1))-this.borders.insideEnd; i++) {
+    const tempRow: Color[] = [];
+    for (let j = (this.factorX*x)+this.borders.insideStart; j < (this.factorX*(x+1))-this.borders.insideEnd; j++) {
+        const c = this.getPixelColor(Math.round(j),Math.round(i));
+        tempRow.push(c);
+      }
+      tempColors.push(tempRow)
+    }
+    console.log(tempColors)
+    this.colors = tempColors;
+}
   private fillColors(){
 
     const colorOverride = Array(this.colors.length).fill(0).map(i => Array(this.colors[0].length).fill(undefined));
     GUIDE.forEach((colorGuide,i) => {
-      const testColor = this.getAverageColor(colorGuide.colorSample.map(c => this.colors[c.i][c.j]));
+      const testColor = Utils.getAverageColor(colorGuide.colorSample.map(c => this.colors[c.i][c.j]));
       //console.log(testColor);
       //console.log(this.getColorSiimilarity(testColor,this.colors[38][90]))
       const colorSims: {i:number,j:number,sim:number}[] = [];
       this.colors.forEach((row,i) => row.forEach((cell,j) => {
-        if(!colorOverride[i][j])colorSims.push({i,j,sim: this.getColorSiimilarity(testColor,cell)})
+        if(!colorOverride[i][j])colorSims.push({i,j,sim: Utils.getColorSimilarity(testColor,cell)})
       }));
     const picked = colorSims.sort((a,b) => a.sim-b.sim).slice(0,colorGuide.count);
     let floss = this.flossDic[colorGuide.floss];
     console.log(floss)//, this.flossDic)
-    const averagedColor = floss ? this.flossToColor(floss) : this.getAverageColor(picked.map(x => this.colors[x.i][x.j]));
+    const averagedColor = floss ? this.flossToColor(floss) : Utils.getAverageColor(picked.map(x => this.colors[x.i][x.j]));
     picked.forEach(x => {
       //reomve this 
       this.colors[x.i][x.j] = JSON.parse(JSON.stringify(averagedColor));
       //keep this
       colorOverride[x.i][x.j] = JSON.parse(JSON.stringify(averagedColor));
     })
-    this.highlighted = averagedColor.str;
+    this.toggleHighlight(averagedColor.str);
     })
     // const numberOfColor = 176;
     // const colorSample = [this.getColorFromRGB([68,100,59]), this.getColorFromRGB([92, 120,85])];
@@ -286,31 +380,6 @@ export class PatternBreakdownComponent {
     // console.log(picked)
   }
 
-  private getColorFromRGB(arr: number[]): Color {
-    const temp = {
-      r: Math.round(arr[0]),
-      g: Math.round(arr[1]),
-      b: Math.round(arr[2]),
-      a: 255,
-      str: '',
-      dmc: '',
-      show: true
-    };
-    temp.str = this.colorToBackground(temp);
-    if (temp.str == 'None') temp.show = false;
-    temp.dmc = this.getDMC(temp);
-
-    if (temp.dmc == 'None') temp.show = false;
-    return temp;
-  }
-
-  private getAverageColor(colors: Color[]): Color {
-    const r = Math.round(colors.reduce((partialSum, a) => partialSum + a.r, 0) / colors.length);
-    const g = Math.round(colors.reduce((partialSum, a) => partialSum + a.g, 0) / colors.length);
-    const b = Math.round(colors.reduce((partialSum, a) => partialSum + a.b, 0) / colors.length);
-    return this.getColorFromRGB([r,g,b])
-  }
-
   private getNoneColor(): Color{
     return {
       r: 255,
@@ -320,7 +389,8 @@ export class PatternBreakdownComponent {
       count: 0,
       dmc: "None",
       show: false,
-      str: "#ffffff"
+      str: "#ffffff",
+      highlighted: false
     };
   }
 
@@ -359,9 +429,11 @@ export class PatternBreakdownComponent {
           str: floss.hex ?? '',
           dmc: floss.floss,
           title: floss.name,
-          show: ![floss.r, floss.g, floss.b].every(a => a == 255)
+          show: ![floss.r, floss.g, floss.b].every(a => a == 255),
+          highlighted: false
         }
   }
+
 
 
   private preformKmeansAnalysis(){
@@ -374,7 +446,7 @@ export class PatternBreakdownComponent {
     })
   });
   console.log(sample)
-  this.generateUniqueColors();
+  this.uniqueColors = Utils.generateUniqueColors(this.colors);
     const uniqueColorsArray = this.uniqueColors.map(c => [c.r,c.g,c.b]);
     //const possible = [4, 23, 351,415,610,739,758, 814, 817,841, 930, 931,932,950,987,3042,3371,3841,3864, "B5200", "White"];
     //console.log(possible.length)
@@ -385,7 +457,7 @@ export class PatternBreakdownComponent {
     console.log(k)
    k.clusters.forEach(cluster =>{
     
-    let newColor: Color = this.getColorFromRGB(cluster.centroid);
+    let newColor: Color = Utils.getColorFromRGB(cluster.centroid);
     
 
    // console.log(cluster.points)
@@ -450,9 +522,7 @@ export class PatternBreakdownComponent {
 
   }
 
-  private getColorSiimilarity(a:Color, b:Color): number{
-    return Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2);
-  }
+
 
   private getBestMatch(c: Color): Color {
     let min = Math.pow(255, 2) * 3;
@@ -475,7 +545,8 @@ export class PatternBreakdownComponent {
       str: bestFloss.hex ?? '',
       dmc: bestFloss.floss,
       title: bestFloss.name,
-      show: ![bestFloss.r, bestFloss.g, bestFloss.b].every(a => a == 255)
+      show: ![bestFloss.r, bestFloss.g, bestFloss.b].every(a => a == 255),
+      highlighted: false
     }
   }
   private getBestMatchYUV(color: Color): Color {
@@ -501,7 +572,8 @@ export class PatternBreakdownComponent {
       str: bestFloss.hex ?? '',
       dmc: bestFloss.floss,
       title: bestFloss.name,
-      show: ![bestFloss.r, bestFloss.g, bestFloss.b].every(a => a == 255)
+      show: ![bestFloss.r, bestFloss.g, bestFloss.b].every(a => a == 255),
+      highlighted: false
     }
   }
   private cosinesim(color: Color, floss: Floss) {
@@ -537,46 +609,46 @@ export class PatternBreakdownComponent {
   }
 
 
-  getDMC(c: Color): string {
-    if (c.str == '#ffffff' || c.str == '#fffdf9') return 'None';
-    else if (c.str == '#4b4b49') return '535';
-    else if (c.str == '#09092f') return '939';
-    else if (c.str == '#3a3068') return '158';
-    else if (c.str == '#39393d') return '3799';
-    else if (c.str == '#494749') return '413';
-    else if (c.str == '#202754') return '803';
-    else if (c.str == '#000000') return '310';
-    else if (c.str == '#999b9d') return '318';
-    else if (c.str == '#908e85') return '647';
+  // getDMC(c: Color): string {
+  //   if (c.str == '#ffffff' || c.str == '#fffdf9') return 'None';
+  //   else if (c.str == '#4b4b49') return '535';
+  //   else if (c.str == '#09092f') return '939';
+  //   else if (c.str == '#3a3068') return '158';
+  //   else if (c.str == '#39393d') return '3799';
+  //   else if (c.str == '#494749') return '413';
+  //   else if (c.str == '#202754') return '803';
+  //   else if (c.str == '#000000') return '310';
+  //   else if (c.str == '#999b9d') return '318';
+  //   else if (c.str == '#908e85') return '647';
 
-    else if (c.str == '#fcfcff') return 'White';
-    else if (c.str == "#e0d7ee") return '24';
-    else if (c.str == "#c5c4c9") return '2';
-    else if (c.str == "#efeef0") return '1';
-    else if (c.str == "#827d7d") return '169';
-    else if (c.str == "#776e72") return '414';
-    else if (c.str == "#9fa8a5") return '927';
-    else if (c.str == "#b0b0b5") return '3';
-    else if (c.str == "#b8b9bd") return '415';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
+  //   else if (c.str == '#fcfcff') return 'White';
+  //   else if (c.str == "#e0d7ee") return '24';
+  //   else if (c.str == "#c5c4c9") return '2';
+  //   else if (c.str == "#efeef0") return '1';
+  //   else if (c.str == "#827d7d") return '169';
+  //   else if (c.str == "#776e72") return '414';
+  //   else if (c.str == "#9fa8a5") return '927';
+  //   else if (c.str == "#b0b0b5") return '3';
+  //   else if (c.str == "#b8b9bd") return '415';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
 
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    // else if (c.str == ) return '';
-    return ''
-  }
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   // else if (c.str == ) return '';
+  //   return ''
+  // }
 }
 //1150 1540

@@ -1,0 +1,11 @@
+
+<div class="colorCont">
+    @for (color of colors; let c = $index; track "color"+c) {
+    <div
+      [ngClass]="{'color': true, 'highlighted': color.highlighted, 'hidden': !color.show}"
+      [title]="color.title || color.str" [ngStyle]="{'background-color':color.str}" (click)="clicked.emit(color)">
+      {{color.count}}
+    </div>
+    }
+  
+  </div>

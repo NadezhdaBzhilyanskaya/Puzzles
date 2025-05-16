@@ -1,0 +1,61 @@
+.cornerDisplay{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 1rem;
+    width: min-content;
+    pattern-display{
+        width: fit-content;
+        border: 2px solid black;
+        margin: auto;
+    }
+    .borderOffsetInput{
+        font-size: 8pt;
+        display: flex;
+        flex-direction: column;
+        & > div{
+            margin: auto 0;
+        }
+        label{
+            margin: auto 3px;
+        }
+        input{
+            width: 16px;
+        }
+        .confirm,.top, .mid, .bot, .left, .right{
+            display: flex;
+        }
+        .right label, .left label{
+            margin-left: 0;
+        }
+        .right{
+            margin-left: auto;
+        }
+        .top, .bot{
+            margin: auto 0;
+            label{
+                margin-left: auto;
+            }
+            input{
+                margin-right: auto;
+            }
+        }
+        .confirm button{
+            font-size: 6pt;
+            margin: auto;
+            width: 50px;
+        }
+
+        input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    -moz-appearance:textfield; /* Firefox */
+}
+
+    }
+}

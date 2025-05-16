@@ -1,0 +1,21 @@
+label{
+    width: 110px;
+    display: inline-block;
+    text-align: right;
+    &.error, &.errorArray{
+        color: red;
+    }
+    &.error + input{
+        border: 2px solid  red;
+    }
+}
+
+input[type="text"]{
+    width: 100px;
+    text-align: center;
+
+}
+
+.attackItem{
+    margin-left: 110px;
+}

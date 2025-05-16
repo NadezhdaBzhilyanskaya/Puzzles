@@ -2,7 +2,8 @@
 <!-- <img src="blockview.png" /> -->
 <div class="options">
   <input type="file" (change)="update($event)" />
-  <input type="number" [value]="Height" (change)="Height = $event.target['value']" />
+  <input type="number" [value]="height" (change)="height = $event.target['value']" />
+  <input type="number" [value]="width" (change)="width = $event.target['value']" />
   <input type="number" [value]="bumpStart" (change)="bumpStart = $event.target['value']" />
   <input type="number" [value]="minCount" (change)="minCount = $event.target['value']" />
   <button (click)="updateImage()">Update</button>
@@ -10,20 +11,34 @@
 
 <canvas id="canvas"></canvas>
 @if(loaded){
+  @if(imageProcessType == ImageProcessingType.SelfFill){
+    <fill-from-pattern [context]="context" [imageData]="imageData" [img]="img" [width]="width" [height]="height"/>
 
-@for (row of colors; let x = $index; track "row"+x) {
+  }@else {
+
+  @if(selectingColorsForCentroid){
+    @if(!selectedCentroidsColors.length || selectedCentroidsColors[selectedCentroidsColors.length-1].length == PIXELS_PER_CENTROID){
+      <span>Picking 1/{{PIXELS_PER_CENTROID}} pixels for color #{{selectedCentroidsColors.length+1}} (out of {{totalColors}})</span>
+    }
+    @else {
+      <span>Picking {{selectedCentroidsColors[selectedCentroidsColors.length-1].length+1}}/{{PIXELS_PER_CENTROID}} pixels for color #{{selectedCentroidsColors.length}} (out of {{totalColors}})</span>
+    }
+  }
+
+<!-- @for (row of colors; let x = $index; track "row"+x) {
 <div class="row">
   @for (color of row; let y = $index; track "cell"+y+color.str ) {
   <div
-    [ngClass]="{'cell': true, 'highlighted': color.str == highlighted,'hidden': !color.show || (color.count?? 0) <= (+minCount), 'white': color.dmc == 'None'}"
+    [ngClass]="{'cell': true, 'highlighted': color.str == highlighted,'hidden': !color.show, 'white': color.dmc == 'None'}"
     [ngStyle]="{'background-color': color.str}" (click)="onClick(color,x,y)">
   </div>
   }
 </div>
 }
+ -->
 
-
-<!-- @for (sym of uniqueSym; let x = $index; track "sym"+x) {
+ <pattern-display [colors]="colors" (clicked)="onClick($event.color,$event.x, $event.y)"/>
+ <!-- @for (sym of uniqueSym; let x = $index; track "sym"+x) {
 <div class="sym">
   @for (row of sym; let x = $index; track "row"+x) {
   <div class="row">
@@ -40,22 +55,17 @@
 
 
 
-<div class="colorCont">
-  @for (color of uniqueColors; let c = $index; track "color"+c) {
-  <div
-    [ngClass]="{'color': true, 'highlighted': color.str == highlighted, 'hidden': !color.show || (color.count?? 0) <= (+minCount)}"
-    [title]="color.title || color.str" [ngStyle]="{'background-color':color.str}" (click)="onClick(color)">
-    {{color.count}}
-  </div>
-  }
+<color-list [colors]="uniqueColors" (clicked)="onClick($event)"/>
 
-</div>
+
 <div class="options">
   <div class="check">
     <label ngFor="show">Hide Colors</label>
     <input type="checkbox" id="show" name="show" [checked]="hide" (change)="hide = $event.target['checked']" />
   </div>
-  <div class="color clear" (click)="highlighted = ''">Clear</div>
+  <div class="color clear" (click)="clearHighlight()">Clear</div>
 </div>
 
+
+}
 }

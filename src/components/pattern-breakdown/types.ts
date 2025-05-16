@@ -28,3 +28,15 @@ export const GUIDE: ColorGuide[] = [{
     floss: 4
 }]
 
+export interface Color { 
+    r: number, 
+    g: number, 
+    b: number, 
+    a: number, 
+    str: string; 
+    dmc: string | number, 
+    title?: string; 
+    show: boolean, 
+    count?: number,
+    highlighted: boolean,
+};

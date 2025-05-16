@@ -1,0 +1,16 @@
+div.diceTray{
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  ::ng-deep canvas.dice-box-canvas{
+    width: 100%;
+    height: fit-content;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+}
+
+
