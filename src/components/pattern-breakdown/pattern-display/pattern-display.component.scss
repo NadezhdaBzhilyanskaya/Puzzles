@@ -3,8 +3,8 @@
     width: fit-content;
   
     // ON SECTION Change
-    &:nth-of-type(86),
-    &:nth-of-type(171) {
+    &:nth-of-type(85),
+    &:nth-of-type(170) {
       margin-bottom: 2px;
     }
   
@@ -12,7 +12,7 @@
   
       // ON SECTION Change
       &:nth-of-type(56),
-      &:nth-child(112) {
+      &:nth-child(112),&:nth-child(168) {
         margin-right: 2px;
         // border-right: 1px solid red !important;
       }
