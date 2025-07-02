@@ -22,7 +22,7 @@ export class PatternBreakdownComponent {
   public ImageProcessingType: typeof ImageProcessingType = ImageProcessingType;
 
   private flossDic: Record<string, Floss> = {};
-  public imageName: any = 'tree.png';// ON IMAGE Change
+  public imageName: any = 'small.png';// ON IMAGE Change
   public img: HTMLImageElement;
   public context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
@@ -101,10 +101,28 @@ export class PatternBreakdownComponent {
     if (this.colors.length) return;
     // console.log(e.target.width, e.target.height)
     this.context.reset();
+// Playing with resizing images on the file that may be too big maybe can be taken out
+    const totalSizeMax = 2000*2000;
+    if((this.img.height*this.img.width) > totalSizeMax){
+      const ratio = this.img.height/this.img.width;
+      const widthNew = Math.round(Math.sqrt(totalSizeMax/ratio))
+      const heightNew = Math.round(widthNew*ratio)
+      this.img.width = widthNew;
+      this.img.height = heightNew;
+    }
+
     this.canvas.height = this.img.height;
     this.canvas.width = this.img.width;
     this.context.drawImage(this.img, 0, 0, this.img.width, this.img.height);
     //console.log(this.context.createImageData(this.img.width, this.img.height))
+   
+    //console.log(this.img.height, this.img.width, widthNew, heightNew, widthNew*heightNew)
+   //this.context.scale(widthNew/this.img.width, heightNew/this.img.height);
+    //console.log(this.img.height, this.img.width, widthNew, heightNew, widthNew*heightNew)
+
+    // this.img.width = widthNew;
+    // this.img.height = heightNew;
+    //this.context.scale()
     this.imageData = this.context.getImageData(0, 0, this.img.width, this.img.height).data;
     console.log(this.img.height, this.img.width)
     this.factorY = this.img.height / this.height;
@@ -164,7 +182,8 @@ export class PatternBreakdownComponent {
   }
 
   public loadFromFile(){
-    this.colors = patternJSON;
+    this.colors =( patternJSON as any);
+    this.removeBorder();
     this.uniqueColors = Utils.loadUniqueColors(this.colors);
     this.loaded = true;
   }

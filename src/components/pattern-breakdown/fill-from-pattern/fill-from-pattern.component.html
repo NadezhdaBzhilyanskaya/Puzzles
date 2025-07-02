@@ -57,8 +57,47 @@
         <button (click)="displayRandomCell()">Get New Random Cell</button> 
         <button>Confirm</button> -->
         <color-list [colors]="uniqueColors" (clicked)="toggleHighlight($event.str)"/>
+        <table>
+          <tr>
+            <th></th>
+            <th>Title</th>
+            <th>str</th>
+            <th>dmc</th>
+            <th>count</th>
+            <th>Pick From Floss</th>
+          </tr>
+        @for(color of uniqueColors; track color){
+          <tr class="colorRow">
+            <td><input type="color" [value]="color.str" (change)="changeColor(color, $event.target['value'])"/></td>
+            <td>{{color.title}}</td>
+            <td>{{color.str}}</td>
+            <td>{{color.dmc}}</td>
+            <td>{{color.count}}</td>
+            <td>
+              <select (change)="changeColor(color, $event.target['value'])">
+                <option value="">--Please choose an option--</option>
+                @for(f of FLOSS; track f){
+                  <option [value]="f.name" [selected]="f.name===color.title">{{f.name}} ({{f.floss}})</option>
+                }
+              </select>
+              
+            </td>
+          </tr>
+       }  
+       </table>
 
     }
+    <!-- @case (FillSteps.ChangeColors) {
+
+      <p>Change Colors</p>
+      <p>Total Colors: {{uniqueColors.length}}</p>
+      <button (click)="createFile()">Create File</button> 
+      <pattern-display class="cellDisplay" [colors]="display" (clicked)="toggleHighlight($event.color.str)"/>
+      <color-list [colors]="uniqueColors" (clicked)="toggleHighlight($event.str)"/>
+     
+
+
+  } -->
     @default {
       This shouldn't happen
     }

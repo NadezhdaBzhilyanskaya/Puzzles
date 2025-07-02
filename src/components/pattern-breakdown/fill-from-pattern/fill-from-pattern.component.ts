@@ -7,10 +7,11 @@ import { PatternDisplayComponent } from '../pattern-display/pattern-display.comp
 import { NgClass, NgStyle } from '@angular/common';
 import { FileCreationService, FileObject } from '../../../services/file-creation.service';
 import { ColorListComponent } from '../color-list/color-list.component';
+import { Floss, FLOSS_LOOK_UP } from '../floss';
 
 
 
-enum FillSteps { Loading, UploadImage, GetBorderOffsets, GetInsideOffset, CombiningColors };
+enum FillSteps { Loading, UploadImage, GetBorderOffsets, GetInsideOffset, CombiningColors, ChangeColors };
 
 interface CornersAndEdges {
   topLeft: Color[][];
@@ -48,7 +49,6 @@ export class FillFromPatternComponent implements OnInit {
   // private fileService: FileCreationService;
 // inputs
   @Input({ required: true }) set imageData(value: Uint8ClampedArray) {
-    console.log(value)
     this._imageData = JSON.parse(JSON.stringify(value));
     console.log('imgData change')
     this.onImageChange();
@@ -73,6 +73,13 @@ export class FillFromPatternComponent implements OnInit {
   public corners: CornersAndEdges = { topLeft: [], topRight: [], botLeft: [], botRight: [], top: [], bot: [], left: [], right: [] };
   public display: Color[][] = [];
   public uniqueColors: Color[] = []
+
+  public FLOSS = FLOSS_LOOK_UP.sort((a,b) =>{
+    if(typeof(a.floss) === 'number' && typeof(b.floss) === 'number') return a.floss-b.floss;
+    else if(typeof(a.floss) === 'string' && typeof(b.floss) === 'string') return a.floss.toString().localeCompare(b.floss.toString());
+    else if(typeof(a.floss) === 'number' ) return -1;
+    else return 1;
+  });
 
   constructor(private fileService:FileCreationService){}
 
@@ -252,7 +259,7 @@ export class FillFromPatternComponent implements OnInit {
   
   this.autoCombine();
   this.currentStep = FillSteps.CombiningColors;
-  
+  console.log(this.uniqueColors,FLOSS_LOOK_UP)
      // this.preformKmeansAnalysis()
   
      // TODO use for IDentifying borders
@@ -397,6 +404,42 @@ export class FillFromPatternComponent implements OnInit {
   //  // this.tempForDisplay(Math.floor(Math.random()*this.Width),Math.floor(Math.random()*this.Height))
 
   // }
+
+  public changeColor(oldColor: Color, changeToColor: string){
+    console.log(oldColor, changeToColor)
+    const floss = FLOSS_LOOK_UP.find(f => f.name === changeToColor);
+    //const newColor: Color = JSON.parse(JSON.stringify(oldColor));
+    const newColor: Color = floss ? {
+      ...oldColor,
+      r: floss.r,
+      g: floss.g,
+      b: floss.b,
+      str:  Utils.rgbToHex(floss.r, floss.g, floss.b),
+      dmc: floss.floss,
+      title: floss.name
+    } : {
+      ...oldColor,
+      ...Utils.hexToRgb(changeToColor),
+      str:  changeToColor,
+    };
+    const i = this.uniqueColors.findIndex(c => c.str === oldColor.str);
+    if(i >= 0) this.uniqueColors[i] = newColor;
+    this.display.forEach(row => row.forEach(c => {
+      if(c.str === oldColor.str) {
+        c.r = newColor.r;
+        c.g = newColor.g;
+        c.b = newColor.b;
+        c.str = newColor.str;
+        c.dmc = newColor.dmc;
+        c.title = newColor.title;
+      };
+    }));
+    
+
+    console.log(oldColor, changeToColor, floss, newColor, this.display) 
+
+
+  }
 
   private getCellAverageColor(x:number,y: number): Color{
     const tempColors: Color[] = [];
