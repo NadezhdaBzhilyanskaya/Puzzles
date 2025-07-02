@@ -48,6 +48,7 @@ export class FillFromPatternComponent implements OnInit {
   // private fileService: FileCreationService;
 // inputs
   @Input({ required: true }) set imageData(value: Uint8ClampedArray) {
+    console.log(value)
     this._imageData = JSON.parse(JSON.stringify(value));
     console.log('imgData change')
     this.onImageChange();
@@ -65,7 +66,7 @@ export class FillFromPatternComponent implements OnInit {
   public downloadableFile: FileObject;
   public currentStep: FillSteps = FillSteps.UploadImage;
 
-  public borders: BorderShift = { top: 7, left: 6, right: 11, bottom: 11, insideStart: 2, insideEnd: 1 };
+  public borders: BorderShift = { top: 0, left: 0, right: 0, bottom: 0, insideStart: 0, insideEnd: 0 };
   public factorY: number = 0;
   public factorX: number = 0;
 

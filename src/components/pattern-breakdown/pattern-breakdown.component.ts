@@ -7,7 +7,7 @@ import { PatternDisplayComponent } from './pattern-display/pattern-display.compo
 import { FillFromPatternComponent } from './fill-from-pattern/fill-from-pattern.component';
 import *  as Utils from './utils';
 import { ColorListComponent } from './color-list/color-list.component';
-import patternJSON from '../../../public/patternOutput.json';
+import patternJSON from '../../../public/patternOutputTree.json';
 
 enum ImageProcessingType { Basic, Kmeans, ConfigAndSim, SelfFill, FromFile};
 
@@ -22,7 +22,7 @@ export class PatternBreakdownComponent {
   public ImageProcessingType: typeof ImageProcessingType = ImageProcessingType;
 
   private flossDic: Record<string, Floss> = {};
-  public imageName: any = 'a.png';// ON IMAGE Change
+  public imageName: any = 'tree.png';// ON IMAGE Change
   public img: HTMLImageElement;
   public context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
@@ -40,12 +40,12 @@ export class PatternBreakdownComponent {
   private factorX: number = 1;// count numbers per square X
   private factorY: number = 1;// count numbers per square Y
   // not important right now
-  public totalColors: number = 28;//35;
+  public totalColors: number = 25;//35;
   public imageProcessType: ImageProcessingType = ImageProcessingType.FromFile;  // ON IMAGE Change (Maybe)
 
-  private borders = {top: 2, left: 1, right: 2,bottom:0, insideStart: 2, insideEnd: 3};
+  private borders = {top: 0, left: 0, right: 0,bottom:0, insideStart: 0, insideEnd: 0};
 
-  public height = 200; // ON IMAGE Change
+  public height = 179; // ON IMAGE Change
   public width = 200; // ON IMAGE Change
 
   ngOnInit(): void {
