@@ -3,7 +3,7 @@
       @for (color of row; let y = $index; track "cell"+y+color.str ) {
       <div
         [ngClass]="{'cell': true, 'highlighted': color.highlighted,'hidden': !color.show, 'white': color.dmc == 'None'}"
-        [ngStyle]="{'background-color': color.str}" (click)="clicked.emit({color,x,y})">
+        [ngStyle]="{'background-color': color.str}" [title]="color.dmc" (click)="clicked.emit({color,x,y})">
       </div>
       }
     </div>

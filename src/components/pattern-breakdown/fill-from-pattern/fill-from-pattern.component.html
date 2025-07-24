@@ -77,7 +77,7 @@
               <select (change)="changeColor(color, $event.target['value'])">
                 <option value="">--Please choose an option--</option>
                 @for(f of FLOSS; track f){
-                  <option [value]="f.name" [selected]="f.name===color.title">{{f.name}} ({{f.floss}})</option>
+                  <option [value]="f.name" [selected]="f.name===color.title">{{f.floss}} - {{f.name}}</option>
                 }
               </select>
               
