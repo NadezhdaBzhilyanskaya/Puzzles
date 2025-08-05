@@ -12,11 +12,26 @@ export  function getPixelColor(imageData: Uint8ClampedArray, width: number, x: n
       show: true,
       highlighted: false
     };
+          //TODO remove
     temp.str = colorToBackground(temp);
     if (temp.str == 'None') temp.show = false;
     temp.dmc = getDMC(temp);
 
     if (temp.dmc == 'None') temp.show = false;
+    //TODO REMOVE
+    console.log(temp, [temp.r,temp.g, temp.b].every(a => a == 255))
+    if([temp.r,temp.g, temp.b].every(a => a == 255)){
+      return {
+        r: 0,
+        g: 0,
+        b: 139,
+        a: 0,
+        str: '#00008b',
+        dmc: 'Dark Blue',
+        show: false,
+        highlighted: false
+      }
+    }
     return temp;
   }
 

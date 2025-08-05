@@ -22,7 +22,7 @@ export class PatternBreakdownComponent {
   public ImageProcessingType: typeof ImageProcessingType = ImageProcessingType;
 
   private flossDic: Record<string, Floss> = {};
-  public imageName: any = 'small.png';// ON IMAGE Change
+  public imageName: any = 'ghost.png';// ON IMAGE Change
   public img: HTMLImageElement;
   public context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
@@ -41,12 +41,12 @@ export class PatternBreakdownComponent {
   private factorY: number = 1;// count numbers per square Y
   // not important right now
   public totalColors: number = 25;//35;
-  public imageProcessType: ImageProcessingType = ImageProcessingType.FromFile;  // ON IMAGE Change (Maybe)
+  public imageProcessType: ImageProcessingType = ImageProcessingType.Basic;  // ON IMAGE Change (Maybe)
 
   private borders = {top: 0, left: 0, right: 0,bottom:0, insideStart: 0, insideEnd: 0};
 
-  public height = 179; // ON IMAGE Change
-  public width = 200; // ON IMAGE Change
+  public height = 200; // ON IMAGE Change
+  public width = 180; // ON IMAGE Change
 
   ngOnInit(): void {
     // setTimeout(() => {
@@ -138,6 +138,7 @@ export class PatternBreakdownComponent {
       for (let x = begin; x < this.img.width; x += this.factorX) {
 
         const c = this.getPixelColor(Math.round(x), Math.round(y));
+
         row.push(c);
         //row.push(this.getBestMatch(c))
         //row.push(this.getBestMatch(this.getPixelColor(x, y)));
