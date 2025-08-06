@@ -7,7 +7,7 @@ import { PatternDisplayComponent } from './pattern-display/pattern-display.compo
 import { FillFromPatternComponent } from './fill-from-pattern/fill-from-pattern.component';
 import *  as Utils from './utils';
 import { ColorListComponent } from './color-list/color-list.component';
-import patternJSON from '../../../public/patternOutputTree.json';
+import patternJSON from '../../../public/patternOutputGhost.json';
 
 enum ImageProcessingType { Basic, Kmeans, ConfigAndSim, SelfFill, FromFile};
 
@@ -41,7 +41,7 @@ export class PatternBreakdownComponent {
   private factorY: number = 1;// count numbers per square Y
   // not important right now
   public totalColors: number = 25;//35;
-  public imageProcessType: ImageProcessingType = ImageProcessingType.Basic;  // ON IMAGE Change (Maybe)
+  public imageProcessType: ImageProcessingType = ImageProcessingType.FromFile;  // ON IMAGE Change (Maybe)
 
   private borders = {top: 0, left: 0, right: 0,bottom:0, insideStart: 0, insideEnd: 0};
 
