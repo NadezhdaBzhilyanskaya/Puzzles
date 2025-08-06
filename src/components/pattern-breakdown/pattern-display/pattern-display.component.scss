@@ -3,16 +3,16 @@
     width: fit-content;
   
     // ON SECTION Change
-    &:nth-of-type(61),
-    &:nth-of-type(135) {
+    &:nth-of-type(79),
+    &:nth-of-type(164) {
       margin-bottom: 2px;
     }
   
     .cell {
   
       // ON SECTION Change
-      &:nth-of-type(37),
-      &:nth-child(89),&:nth-child(141) {
+      &:nth-of-type(59),
+      &:nth-child(119) {
         margin-right: 2px;
         // border-right: 1px solid red !important;
       }
