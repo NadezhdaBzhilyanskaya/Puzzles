@@ -26,8 +26,8 @@ export  function getPixelColor(imageData: Uint8ClampedArray, width: number, x: n
         g: 0,
         b: 139,
         a: 0,
-        str: '#00008b',
-        dmc: 'Dark Blue',
+        str: '#ffffff',
+        dmc: 'White',
         show: false,
         highlighted: false
       }
