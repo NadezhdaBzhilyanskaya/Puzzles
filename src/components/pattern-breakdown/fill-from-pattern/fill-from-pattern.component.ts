@@ -41,7 +41,7 @@ interface BorderShift {
   styleUrl: './fill-from-pattern.component.scss'
 })
 export class FillFromPatternComponent implements OnInit {
-  // Const 
+
   private readonly SIMILARITY_QUOTIENT = 150;
 //Enums
   public FillSteps: typeof FillSteps = FillSteps;
@@ -60,6 +60,7 @@ export class FillFromPatternComponent implements OnInit {
   @Input({ required: true }) context!: CanvasRenderingContext2D;
   @Input() width: number = 0;
   @Input() height: number = 0;
+
   //@Output() clicked: EventEmitter<ColorClick> = new EventEmitter<ColorClick>();
 
   // regular variables
@@ -177,7 +178,7 @@ export class FillFromPatternComponent implements OnInit {
     } else if(key === 'insideStart' || key === 'insideEnd'){
       this.adjustStylesCellDisplay();
     }
-    
+
     // delete this.corners.topLeft;
     // this.corners.topLeft =this.originalCorners.topLeft.slice(this.borders.top).map(row => row.slice(this.borders.left));
     // delete this.corners.top;
@@ -218,7 +219,7 @@ export class FillFromPatternComponent implements OnInit {
   }
 
   public confirmBorder(){
-      
+
     if(this.currentStep !== FillSteps.GetBorderOffsets) return;
     this.currentStep = FillSteps.GetInsideOffset;
     this.img.width = this.img.width-this.borders.left-this.borders.right;
@@ -231,18 +232,18 @@ export class FillFromPatternComponent implements OnInit {
   }
 
   public confirmInsideOffset(){
-  
+
     // this.img.height = imgHeight;
     // this.img.width = imgWidth;
     //console.log('hi', JSON.parse(JSON.stringify(this.colors.slice(0,  Math.round(this.factorY)).map(row => row.slice(0, Math.round(this.factorX))))))
-  
+
     if(this.currentStep !== FillSteps.GetInsideOffset) return;
     this.currentStep = FillSteps.Loading;
 
-  
-  
+
+
       this.display = [];
-  
+
       for(let i = 0; i < this.height;i++){
         const row: Color[] = [];
         for(let j = 0; j < this.width;j++){
@@ -254,14 +255,14 @@ export class FillFromPatternComponent implements OnInit {
       //console.log(this.display)
       this.uniqueColors = Utils.loadUniqueColors(this.display);
 
-  
+
       //console.log('auto')
-  
+
   this.autoCombine();
   this.currentStep = FillSteps.CombiningColors;
   console.log(this.uniqueColors,FLOSS_LOOK_UP)
      // this.preformKmeansAnalysis()
-  
+
      // TODO use for IDentifying borders
     //   const tempColors = [];
     //  for (let i = (this.factorY*0)+this.borders.insideStart; i < (this.factorY*(1+1))-this.borders.insideEnd; i++) {
@@ -269,11 +270,11 @@ export class FillFromPatternComponent implements OnInit {
     //   for (let j = (this.factorX*49)+this.borders.insideStart; j < (this.factorX*(50+1))-this.borders.insideEnd; j++) {
     //  // for (let y = 0; y < this.factorY*(1); y++) {
     //   //for (let y = Math.round(this.img.height-(this.factorY*3)); y < this.img.height; y++) {
-  
+
     //     //const tempRow: Color[] = [];
     //     //for (let x = Math.round(this.img.width-(this.factorX*3)); x < this.img.width; x++) {
     //     //for (let x = 0; x < this.factorX*1; x++) {
-  
+
     //      // console.log(x,y)
     //       const c = this.getPixelColor(j,i);
     //       row.push(c);
@@ -296,30 +297,21 @@ export class FillFromPatternComponent implements OnInit {
       this.combineColors(toCombine);
       colorToCheck = this.similarColorsExist();
     }
+
   }
+
 
   private similarColorsExist(out = false): Color | undefined{
     for(let i = 0; i< this.uniqueColors.length; i++){
       for(let j = i+1; j< this.uniqueColors.length; j++){
         if(out) console.log(Utils.getColorSimilarity(this.uniqueColors[i], this.uniqueColors[j]) )
-        if(Utils.getColorSimilarity(this.uniqueColors[i], this.uniqueColors[j]) < this.SIMILARITY_QUOTIENT) 
+        if(Utils.getColorSimilarity(this.uniqueColors[i], this.uniqueColors[j]) < this.SIMILARITY_QUOTIENT)
           return this.uniqueColors[i];
       }
     }
     return undefined;
   }
 
-  // private similarColorsExist(exclude: string[], out = false): Color | undefined{
-  //   for(let i = 0; i< this.uniqueColors.length; i++){
-  //     for(let j = i+1; j< this.uniqueColors.length; j++){
-  //       if(out) console.log(Utils.getColorSimilarity(this.uniqueColors[i], this.uniqueColors[j]) )
-  //       if(!exclude.includes(this.uniqueColors[i].str) && !exclude.includes(this.uniqueColors[j].str) 
-  //         && Utils.getColorSimilarity(this.uniqueColors[i], this.uniqueColors[j]) < this.SIMILARITY_QUOTIENT) 
-  //         return this.uniqueColors[i];
-  //     }
-  //   }
-  //   return undefined;
-  // }
 
   private getSimilar(c: Color): Color[]{
     const similar: Color[] = [];
@@ -333,14 +325,16 @@ export class FillFromPatternComponent implements OnInit {
   }
 
   public combineCurrent(){
-    const colorsToCombine = this.uniqueColors.filter(c => c.highlighted);
-    this.combineColors(colorsToCombine);
+    this.currentStep = FillSteps.Loading;
+    setTimeout(() => this.currentStep = FillSteps.CombiningColors,100)
+    this.combineColors(this.uniqueColors.filter(c => c.highlighted));
   }
 
   public combineColors(colorsToCombine: Color[]){
     const colorsToCombineStr = colorsToCombine.map(c => c.str);
+
     //console.log(colorsToCombineStr)
-    const avg = Utils.getAverageColorAsArr(colorsToCombine);
+    const avg = colorsToCombineStr.includes("#ffffff") ? [255,255,255] : Utils.getAverageColorAsArr(colorsToCombine);
     this.display = this.display.map(row => row.map(cell => {
       if(colorsToCombineStr.includes(cell.str)) {
         return Utils.getColorFromRGB(avg)
@@ -434,9 +428,9 @@ export class FillFromPatternComponent implements OnInit {
         c.title = newColor.title;
       };
     }));
-    
 
-    console.log(oldColor, changeToColor, floss, newColor, this.display) 
+
+    console.log(oldColor, changeToColor, floss, newColor, this.display)
 
 
   }
@@ -455,6 +449,8 @@ export class FillFromPatternComponent implements OnInit {
 
   public displayRandomCell(){
     if(this.currentStep !== FillSteps.GetInsideOffset) return;
+    this.currentStep = FillSteps.Loading;
+    setTimeout(() => this.currentStep = FillSteps.GetInsideOffset,100);
     const x = Math.floor(Math.random()*this.width);
     const y = Math.floor(Math.random()*this.height);
     const tempColors: Color[][] = [];

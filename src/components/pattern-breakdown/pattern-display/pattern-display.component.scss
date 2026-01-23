@@ -3,20 +3,20 @@
     width: fit-content;
   
     // ON SECTION Change
-    &:nth-of-type(81),
-    &:nth-of-type(166) {
-      margin-bottom: 2px;
-    }
+    // &:nth-of-type(81),
+    // &:nth-of-type(166) {
+    //   margin-bottom: 2px;
+    // }
   
     .cell {
   
       // ON SECTION Change
-      &:nth-of-type(54),
-      &:nth-child(114),
-        &:nth-child(174) {
-        margin-right: 2px;
-        // border-right: 1px solid red !important;
-      }
+      // &:nth-of-type(54),
+      // &:nth-child(114),
+      //   &:nth-child(174) {
+      //   margin-right: 2px;
+      //   // border-right: 1px solid red !important;
+      // }
   
       // &:nth-child(n+75),
       // &:nth-child(n+75).hidden {

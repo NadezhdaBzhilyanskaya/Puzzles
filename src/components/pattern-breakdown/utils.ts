@@ -19,12 +19,12 @@ export  function getPixelColor(imageData: Uint8ClampedArray, width: number, x: n
 
     if (temp.dmc == 'None') temp.show = false;
     //TODO REMOVE
-    console.log(temp, [temp.r,temp.g, temp.b].every(a => a == 255))
+    //console.log(temp, [temp.r,temp.g, temp.b].every(a => a == 255))
     if([temp.r,temp.g, temp.b].every(a => a == 255)){
       return {
-        r: 0,
-        g: 0,
-        b: 139,
+        r: 255,
+        g: 255,
+        b: 255,
         a: 0,
         str: '#ffffff',
         dmc: 'White',
@@ -146,7 +146,7 @@ export function colorToBackground(c: Color): string {
     // ON SECTION Change
    //if (imageName == 'test.png') colors = colors.slice(0, 76).map(r => r.slice(171))//, 171))
    const uniqueColors = generateUniqueColors(display);
-   console.log(uniqueColors.length)
+   //console.log(uniqueColors.length)
 
    uniqueColors.forEach(c => {
      //console.log(basicSim(c))

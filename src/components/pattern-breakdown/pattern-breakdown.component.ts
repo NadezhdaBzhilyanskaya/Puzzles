@@ -7,7 +7,7 @@ import { PatternDisplayComponent } from './pattern-display/pattern-display.compo
 import { FillFromPatternComponent } from './fill-from-pattern/fill-from-pattern.component';
 import *  as Utils from './utils';
 import { ColorListComponent } from './color-list/color-list.component';
-import patternJSON from '../../../public/patternOutputGhost.json';
+import patternJSON from '../../../public/patternOutputMushroomHedgehog.json';
 
 enum ImageProcessingType { Basic, Kmeans, ConfigAndSim, SelfFill, FromFile};
 
@@ -40,13 +40,13 @@ export class PatternBreakdownComponent {
   private factorX: number = 1;// count numbers per square X
   private factorY: number = 1;// count numbers per square Y
   // not important right now
-  public totalColors: number = 25;//35;
-  public imageProcessType: ImageProcessingType = ImageProcessingType.Basic;  // ON IMAGE Change (Maybe)
+  public totalColors: number = 18;//35;
+  public imageProcessType: ImageProcessingType = ImageProcessingType.FromFile;  // ON IMAGE Change (Maybe)
 
   private borders = {top: 0, left: 0, right: 0,bottom:0, insideStart: 0, insideEnd: 0};
 
-  public height = 220; // ON IMAGE Change
-  public width = 220; // ON IMAGE Change
+  public height = 90; // ON IMAGE Change
+  public width = 80; // ON IMAGE Change
 
   ngOnInit(): void {
     // setTimeout(() => {
@@ -123,10 +123,19 @@ export class PatternBreakdownComponent {
     // this.img.width = widthNew;
     // this.img.height = heightNew;
     //this.context.scale()
+    //this.width =  Math.round(this.img.width/6.1);
+    //this.height =  Math.round(this.img.height/6.1)
+    //console.log(this.img.height, this.img.width)
+    //console.log(this.height, this.width)
     this.imageData = this.context.getImageData(0, 0, this.img.width, this.img.height).data;
-    console.log(this.img.height, this.img.width)
+
     this.factorY = this.img.height / this.height;
+
     this.factorX = this.img.width / this.width;
+    console.log(this.img.height/this.factorX)
+
+
+
     console.log(this.img.height, this.img.width, this.factorY, this.factorY, this.bumpStart, this.img.height / this.height)
     const begin = Number(this.bumpStart);
 
@@ -177,7 +186,7 @@ export class PatternBreakdownComponent {
     // }
     else if(this.imageProcessType == ImageProcessingType.ConfigAndSim) this.fillColors();
     //else if(this.imageProcessType == 'self-fill') this.calcAverages();
-
+  console.log(this.colors.length,this.colors[0].length)
    this.uniqueColors = Utils.loadUniqueColors(this.colors);
    this.loaded = true;
   }
@@ -186,6 +195,7 @@ export class PatternBreakdownComponent {
     this.colors =( patternJSON as any);
     this.removeBorder();
     this.uniqueColors = Utils.loadUniqueColors(this.colors);
+    console.log(this.uniqueColors.map(c => c.dmc).sort())
     this.loaded = true;
   }
 
