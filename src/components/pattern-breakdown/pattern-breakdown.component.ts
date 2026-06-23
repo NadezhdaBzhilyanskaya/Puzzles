@@ -41,12 +41,12 @@ export class PatternBreakdownComponent {
   private factorY: number = 1;// count numbers per square Y
   // not important right now
   public totalColors: number = 18;//35;
-  public imageProcessType: ImageProcessingType = ImageProcessingType.FromFile;  // ON IMAGE Change (Maybe)
+  public imageProcessType: ImageProcessingType = ImageProcessingType.Basic;  // ON IMAGE Change (Maybe)
 
   private borders = {top: 0, left: 0, right: 0,bottom:0, insideStart: 0, insideEnd: 0};
 
-  public height = 90; // ON IMAGE Change
-  public width = 80; // ON IMAGE Change
+  public height = 169; // ON IMAGE Change
+  public width = 200; // ON IMAGE Change
 
   ngOnInit(): void {
     // setTimeout(() => {
