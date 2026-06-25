@@ -174,7 +174,8 @@ export class PatternBreakdownComponent {
    // this.fillColors();
 
     //Clean up stuff
-    this.removeBorder();
+    // TODO turn back on
+    //this.removeBorder();
 
     if(this.imageProcessType == ImageProcessingType.Kmeans) this.preformKmeansAnalysis()
     // else if(this.imageProcessType == 'self-fill-kmeans') {

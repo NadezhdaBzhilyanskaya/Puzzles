@@ -67,7 +67,7 @@ export function colorToBackground(c: Color): string {
   }
 
   export function getDMC(c: Color): string {
-    if (c.str == '#ffffff' || c.str == '#fcfcfc') return 'None';
+    if (c.str == '#ffffff') return 'None';
     else if (c.str == '#4b4b49') return '535';
     else if (c.str == '#09092f') return '939';
     else if (c.str == '#3a3068') return '158';
