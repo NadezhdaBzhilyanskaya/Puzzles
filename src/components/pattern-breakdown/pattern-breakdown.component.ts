@@ -22,7 +22,7 @@ export class PatternBreakdownComponent {
   public ImageProcessingType: typeof ImageProcessingType = ImageProcessingType;
 
   private flossDic: Record<string, Floss> = {};
-  public imageName: any = 'blockview.png';// ON IMAGE Change
+  public imageName: any = 'WatercolorWitch.png';// ON IMAGE Change
   public img: HTMLImageElement;
   public context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
@@ -45,8 +45,8 @@ export class PatternBreakdownComponent {
 
   private borders = {top: 0, left: 0, right: 0,bottom:0, insideStart: 0, insideEnd: 0};
 
-  public height = 169; // ON IMAGE Change
-  public width = 200; // ON IMAGE Change
+  public height = 265; // ON IMAGE Change
+  public width = 179; // ON IMAGE Change
 
   ngOnInit(): void {
     // setTimeout(() => {
