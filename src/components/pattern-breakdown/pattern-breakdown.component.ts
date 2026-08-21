@@ -45,8 +45,8 @@ export class PatternBreakdownComponent {
 
   private borders = {top: 0, left: 0, right: 0,bottom:0, insideStart: 0, insideEnd: 0};
 
-  public height = 265; // ON IMAGE Change
-  public width = 179; // ON IMAGE Change
+  public height = 268; // ON IMAGE Change
+  public width = 200; // ON IMAGE Change
 
   ngOnInit(): void {
     // setTimeout(() => {
@@ -175,7 +175,7 @@ export class PatternBreakdownComponent {
 
     //Clean up stuff
     // TODO turn back on
-    //this.removeBorder();
+    this.removeBorder();
 
     if(this.imageProcessType == ImageProcessingType.Kmeans) this.preformKmeansAnalysis()
     // else if(this.imageProcessType == 'self-fill-kmeans') {
@@ -189,6 +189,7 @@ export class PatternBreakdownComponent {
     //else if(this.imageProcessType == 'self-fill') this.calcAverages();
   console.log(this.colors.length,this.colors[0].length)
    this.uniqueColors = Utils.loadUniqueColors(this.colors);
+   console.log(JSON.parse(JSON.stringify(this.uniqueColors)))
    this.loaded = true;
   }
 
